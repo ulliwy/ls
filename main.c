@@ -6,7 +6,7 @@
 /*   By: iprokofy <iprokofy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/06 15:30:34 by iprokofy          #+#    #+#             */
-/*   Updated: 2017/11/09 15:31:02 by iprokofy         ###   ########.fr       */
+/*   Updated: 2017/11/14 16:42:21 by iprokofy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ int		parse_opts(char *op, t_opt *opts, int *is_op)
 	return (1);
 }
 
-void	print_parameters(t_opt opts, t_list *opendirs)
+void	print_parameters(t_opt opts)
 {
 	printf("options: \n");
 	printf("   R: %d\n", opts.R);
@@ -69,21 +69,66 @@ void	print_parameters(t_opt opts, t_list *opendirs)
 	printf("   l: %d\n", opts.l);
 	printf("   r: %d\n", opts.r);
 	printf("   t: %d\n", opts.t);
-	while (opendirs)
+}
+
+void	print_names(t_darr *arr)
+{
+	int i = 0;
+
+	if (!arr)
+		return ;
+
+	printf("cur: %d\n", arr->cur);
+	while (i < arr->cur)
 	{
-		
+		printf("%s\n", arr->names[i]);
+		i++;
 	}
+}
+
+void	append(t_darr *arr, char *name)
+{
+	//char	**new_arr;
+
+	//printf("%p\n", new_arr);
+	char **new_arr = malloc(5);
+	free(new_arr);
+	printf("%s\n", name);
+	if (arr->cur >= arr->max)
+	{
+		printf("this %d\n", arr->max);
+		
+		//
+		//new_arr = (char *)malloc(sizeof(int));
+		//printf("%s\n", arr->names[0]);
+		//new = ft_memcpy(new, arr->names, arr->max);
+		//printf("%s\n", arr->names[0]);
+		return ;
+	}  
+	arr->names[arr->cur] = name;
+		//printf("%s\n", arr->names[arr->cur]);
+	arr->cur++;
+
+	//printf("%d\n", arr->cur);
+	//printf("%d\n", arr->max);
+}
+
+void	names_init(t_darr *arr)
+{
+	arr->cur = 0;
+	arr->max = 5;
+	arr->names = (char **)malloc(arr->max);
 }
 
 int		main(int argc, char **argv)
 {
-	t_list	*opendirs;
+	t_darr	names;
 	t_opt	opts;
 	int		i;
 	int 	is_op;
 	int 	parsed_opt;
 
-	opendirs = NULL;
+	names_init(&names);
 	i = 1;
 	is_op = 1;
 	parsed_opt = 1;
@@ -95,13 +140,14 @@ int		main(int argc, char **argv)
 		else
 		{
 			is_op = 0;
-			ft_lstadd(&opendirs, ft_lstnew(argv[i], sizeof(argv[i])));
+			append(&names, argv[i]);
 		}
 		i++;
 	}
-	if (!opendirs || opts.cur_dir)
-		ft_lstadd(&opendirs, ft_lstnew(".", sizeof(".")));
-	print_parameters(opts, opendirs);
+	if (!names.cur || opts.cur_dir)
+		append(&names, ".");
+	//print_parameters(opts);
+	//print_names(&names);
 	//process printing
 	return (0);
 }
