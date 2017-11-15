@@ -6,7 +6,7 @@
 /*   By: iprokofy <iprokofy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/06 15:30:34 by iprokofy          #+#    #+#             */
-/*   Updated: 2017/11/14 16:42:21 by iprokofy         ###   ########.fr       */
+/*   Updated: 2017/11/15 15:54:20 by iprokofy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,38 +86,94 @@ void	print_names(t_darr *arr)
 	}
 }
 
+char	**pcpy(char **dst, char **src, size_t n)
+{
+	while (n > 0)
+	{
+		*dst = *src;
+		dst++;
+		src++;
+		n--;
+	}
+	return (dst);
+}
+
 void	append(t_darr *arr, char *name)
 {
-	//char	**new_arr;
+	char	**new_arr;
 
-	//printf("%p\n", new_arr);
-	char **new_arr = malloc(5);
-	free(new_arr);
-	printf("%s\n", name);
-	if (arr->cur >= arr->max)
+	if (arr->cur == arr->max)
 	{
-		printf("this %d\n", arr->max);
-		
-		//
-		//new_arr = (char *)malloc(sizeof(int));
-		//printf("%s\n", arr->names[0]);
-		//new = ft_memcpy(new, arr->names, arr->max);
-		//printf("%s\n", arr->names[0]);
-		return ;
+		new_arr = (char **)malloc((sizeof(char *)) * arr->max * 2);
+		pcpy(new_arr, arr->names, arr->max);
+		free(arr->names);
+		arr->names = new_arr;
+		arr->max = arr->max * 2;
 	}  
 	arr->names[arr->cur] = name;
-		//printf("%s\n", arr->names[arr->cur]);
 	arr->cur++;
-
-	//printf("%d\n", arr->cur);
-	//printf("%d\n", arr->max);
 }
 
 void	names_init(t_darr *arr)
 {
 	arr->cur = 0;
 	arr->max = 5;
-	arr->names = (char **)malloc(arr->max);
+	arr->names = (char **)malloc((sizeof(char *)) * arr->max);
+}
+
+void	ls_files(t_darr fls)
+{
+	int i;
+
+	i = 0;
+	while (i < fls.cur)
+	{
+		printf("%d: %s\n", i, fls.names[i]);
+		i++;
+	}
+}
+
+void	ft_ls(char *name)
+{
+	printf("%s:\n", name);
+}
+
+int 	pre_ls(t_darr arr, t_opt opts)
+{
+	int			i;
+	struct stat	s_file_stat;
+	t_darr		dir;
+	t_darr		fls;
+
+	i = 0;
+	names_init(&dir);
+	names_init(&fls);
+	while (i < arr.cur)
+	{
+		if (stat(arr.names[i], &s_file_stat) < 0)
+		{
+			ft_putstr("ft_ls: ");
+			perror(arr.names[i]);
+		}
+		else if (S_ISDIR(s_file_stat.st_mode))
+			append(&dir, arr.names[i]);
+		else
+			append(&fls, arr.names[i]);
+		i++;
+	}
+	ls_files(fls);
+	free(fls.names);
+	i = 0;
+	while (i < dir.cur)
+	{
+		ft_putstr("\n");
+		ft_ls(dir.names[i]);
+		i++;
+	}
+	print_parameters(opts);
+
+	free(dir.names);
+	return (0);
 }
 
 int		main(int argc, char **argv)
@@ -146,8 +202,9 @@ int		main(int argc, char **argv)
 	}
 	if (!names.cur || opts.cur_dir)
 		append(&names, ".");
-	//print_parameters(opts);
-	//print_names(&names);
-	//process printing
+	sort_names(names.names, names.cur);
+
+	pre_ls(names, opts);
+	free(names.names);
 	return (0);
 }

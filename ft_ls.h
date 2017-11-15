@@ -6,7 +6,7 @@
 /*   By: iprokofy <iprokofy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/09 11:13:38 by iprokofy          #+#    #+#             */
-/*   Updated: 2017/11/14 14:59:43 by iprokofy         ###   ########.fr       */
+/*   Updated: 2017/11/15 15:54:34 by iprokofy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 # define FT_LS_H
 
 #include "libft/libft.h"
+#include "ft_printf/ft_printf.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <errno.h>
 
 typedef struct	s_opt
 {
@@ -28,6 +32,7 @@ typedef struct	s_opt
 typedef struct	s_dir
 {
 	char		*name;
+	struct stat	s_stat;
 }				t_dir;
 
 typedef struct 	s_darr
@@ -36,5 +41,7 @@ typedef struct 	s_darr
 	int			max;
 	char		**names;
 }				t_darr;
+
+int		sort_names(char **arr, int n);
 
 #endif
