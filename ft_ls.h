@@ -6,7 +6,7 @@
 /*   By: iprokofy <iprokofy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/09 11:13:38 by iprokofy          #+#    #+#             */
-/*   Updated: 2017/11/15 15:54:34 by iprokofy         ###   ########.fr       */
+/*   Updated: 2017/11/16 14:00:40 by iprokofy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 #include <sys/stat.h>
 #include <errno.h>
 
+# define MAX_LEN 5
+
 typedef struct	s_opt
 {
 	int			l;
@@ -29,19 +31,19 @@ typedef struct	s_opt
 	int			cur_dir;
 }				t_opt;
 
-typedef struct	s_dir
+typedef struct	s_file
 {
 	char		*name;
 	struct stat	s_stat;
-}				t_dir;
+}				t_file;
 
-typedef struct 	s_darr
+typedef struct 	s_dir
 {
 	int			cur;
-	int			max;
-	char		**names;
-}				t_darr;
+	int 		max;
+	t_file		*files;
+}				t_dir;
 
-int		sort_names(char **arr, int n);
+int		sort_files(t_file *arr, int n);
 
 #endif
