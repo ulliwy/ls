@@ -6,13 +6,13 @@
 /*   By: iprokofy <iprokofy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/14 11:29:49 by iprokofy          #+#    #+#             */
-/*   Updated: 2017/11/16 17:04:49 by iprokofy         ###   ########.fr       */
+/*   Updated: 2017/11/17 12:54:57 by iprokofy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
 
-int		sort_files(char **arr, int n)
+int		sort_files(char **arr, int n, int rev)
 {
 	int i;
 	int j;
@@ -25,7 +25,7 @@ int		sort_files(char **arr, int n)
 		j = 0;
 		while (j < n)
 		{
-			if (ft_strcmp(arr[i], arr[j]) < 0)
+			if (!rev ? ft_strcmp(arr[i], arr[j]) < 0 : ft_strcmp(arr[i], arr[j]) > 0)
 			{
 				tmp = arr[i];
 				arr[i] = arr[j];

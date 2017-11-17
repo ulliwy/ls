@@ -6,7 +6,7 @@
 /*   By: iprokofy <iprokofy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/06 15:30:34 by iprokofy          #+#    #+#             */
-/*   Updated: 2017/11/16 17:08:25 by iprokofy         ###   ########.fr       */
+/*   Updated: 2017/11/17 14:44:26 by iprokofy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,17 +93,57 @@ void	print_names(t_dir *arr)
 	}
 }
 
-void	ls_files(t_dir fls, t_opt opts)
+// void	long_output(t_dir fls, t_opt opts, char *dir_name)
+// {
+
+// }
+
+void	regular_output(t_dir fls, int hidden)
 {
 	int i;
+	int j;
 
-	opt_init(&opts);
 	i = 0;
+	hidden = 0;
 	while (i < fls.cur)
 	{
-		printf("%d: %s\n", i, fls.files[i]);
-		i++;
+		j = i;
+		if (i)
+			ft_printf("\n");
+		while (j < fls.cur)
+		{
+			//printf("j: %d\n", j);
+			ft_printf("%-*.15s", COL_SIZE, fls.files[j]);
+			j = j + 1 + N_COL;
+		}
+		i = i + N_COL;
 	}
+
+	// while (i < N_COL)
+	// {
+	// 	j = i;
+	// 	if (i)
+	// 		ft_printf("\n");
+	// 	while (j < fls.cur)
+	// 	{
+	// 		//printf("j: %d\n", j);
+	// 		ft_printf("%-*.15s", COL_SIZE, fls.files[j]);
+	// 		j = j + N_COL;
+	// 	}
+	// 	i++;
+	// }
+}
+
+
+int		ls_files(t_dir fls, t_opt opts, char *dir_name, int need_dir_name)
+{
+	if (need_dir_name)
+		ft_printf("%s:\n", dir_name);
+	if (!opts.l)
+		regular_output(fls, opts.a);
+		//long_output(t_dir fls, opts, char *dir_name);		
+	ft_printf("\n");
+	return (1);
 }
 
 char	**pcpy(char **dst, char **src, size_t n)
@@ -117,52 +157,6 @@ char	**pcpy(char **dst, char **src, size_t n)
 	}
 	return (dst);
 }
-
-// void	append_stat(t_dir *arr, char *name, struct stat s_file_stat)
-// {
-// 	t_file	*new_arr;
-
-// 	if (arr->cur == arr->max)
-// 	{
-// 		new_arr = (t_file *)malloc((sizeof(t_file)) * arr->max * 2);
-// 		pcpy(new_arr, arr->files, arr->max);
-// 		free(arr->files);
-// 		arr->files = new_arr;
-// 		arr->max = arr->max * 2;
-// 	}  
-// 	(arr->files[arr->cur]).name = name;
-// 	(arr->files[arr->cur]).s_stat = s_file_stat;
-// 	arr->cur++;
-// }
-
-// char	*ft_addpath(char const *s1, char const *s2)
-// {
-// 	char			*new;
-// 	char			*new_start;
-
-// 	if (!s1 || !s2)
-// 		return (NULL);
-// 	if (!(new = (char *)malloc(sizeof(char) *
-// 		(ft_strlen(s1) + ft_strlen(s2) + 1 + 1))))
-// 		return (NULL);
-// 	new_start = new;
-// 	while (*s1)
-// 	{
-// 		*new = *s1;
-// 		new++;
-// 		s1++;
-// 	}
-// 	*new = '/';
-// 	new++;
-// 	while (*s2)
-// 	{
-// 		*new = *s2;
-// 		new++;
-// 		s2++;
-// 	}
-// 	*new = '\0';
-// 	return (new_start);
-// }
 
 void	append(t_dir *arr, char *name)
 {
@@ -180,53 +174,69 @@ void	append(t_dir *arr, char *name)
 	arr->cur++;
 }
 
-// void	ft_ls(char *d, t_opt opts)
-// {
-// 	DIR 			*dir;
-// 	struct dirent 	*dp;
-// 	t_dir 			items;
-// 	struct stat		s_file_stat;
-// 	int i;
-// 	char *new;
+char	*create_path(char *outer, char *inner)
+{
+	char	*name;
+	char	*ret;
 
-// 	dir_init(&items);
-// 	if (!(dir = opendir(d)))
-// 	{
-// 		ft_putstr("ft_ls: ");
-// 		perror(d);
-// 	}
-// 	while ((dp = readdir(dir)))
-// 	{
-// 		if (ft_strcmp(dp->d_name, ".") && ft_strcmp(dp->d_name, ".."))
-// 		{
-// 			stat(dp->d_name, &s_file_stat);
-// 			append(&items, dp->d_name);
-// 		}
-// 	}
-// 	ls_files(items, opts);
-// 	i = 0;
-// 	if (opts.R)
-// 	{
-// 		while (i < items.cur)
-// 		{
-// 			if (!stat(items.files[i].name, &s_file_stat))
-// 				if (S_ISDIR(s_file_stat.st_mode) && ft_strcmp(items.files[i].name, ".")
-// 					&& ft_strcmp(items.files[i].name, ".."))
-// 				{
-// 					new = ft_addpath(dp->d_name, items.files[i]);
-// 					//free()
-// 					//printf("dir: %s\n", items.files[i].name);
-// 					ft_ls(, opts);
-// 				}
-// 			i++;
-// 		}
-// 	}
-// 	free(items.files);
-// }
+	name = (char*)malloc(ft_strlen(outer) + ft_strlen(inner) + 2);
+	ret = name;
+	while (*outer)
+		*name++ = *outer++;
+	*name = 47;
+	name++;
+	while (*inner)
+		*name++ = *inner++;
+	*name = '\0';
+	return (ret);
+}
 
+void	ft_ls(char *d, t_opt opts, int need_dir_name)
+{
+	DIR 			*dir;
+	struct dirent 	*dp;
+	t_dir 			items;
+	struct stat		s_file_stat;
+	int 			i;
+	char			*name;
 
+	dir_init(&items);
+	if (!(dir = opendir(d)))
+	{
+		ft_putstr("ft_ls: ");
+		perror(d);
+		return ;
+	}
+	while ((dp = readdir(dir)))
+	{
+		stat(dp->d_name, &s_file_stat);
+		append(&items, dp->d_name);
+	}
+	sort_files(items.files, items.cur, opts.r);
+	ls_files(items, opts, d, need_dir_name);
+	i = 0;
+	if (opts.R)
+	{
+		while (i < items.cur)
+		{
 
-int 	pre_ls(t_dir arr, t_opt opts)
+			name = create_path(d, items.files[i]);
+			if (!stat(name, &s_file_stat) && S_ISDIR(s_file_stat.st_mode)
+					&& ft_strcmp(items.files[i], ".")
+					&& ft_strcmp(items.files[i], ".."))
+			{
+				ft_printf("\n");
+				ft_ls(name, opts, 1);
+			}
+				
+			free(name);
+			i++;
+		}
+	}
+	free(items.files);
+}
+
+int 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 {
 	int			i;
 	struct stat	s_file_stat;
@@ -249,11 +259,14 @@ int 	pre_ls(t_dir arr, t_opt opts)
 			append(&fls, arr.files[i]);
 		i++;
 	}
-	ls_files(fls, opts);
+	if (fls.cur > 0)
+		ls_files(fls, opts, 0, 0);
 	i = 0;
 	while (i < dir.cur)
 	{
-		//ft_ls(dir.files[i], opts);
+		if (i)
+			ft_printf("\n");
+		ft_ls(dir.files[i], opts, need_dir_name);
 		i++;
 	}
 	free(fls.files);
@@ -288,10 +301,8 @@ int		main(int argc, char **argv)
 	if (!args.cur || opts.cur_dir)
 		append(&args, ".");
 	
-	sort_files(args.files, args.cur);
-	// print_parameters(opts);
-	//print_names(&args);
-	pre_ls(args, opts);
+	sort_files(args.files, args.cur, opts.r);
+	pre_ls(args, opts, args.cur > 1 ? 1 : 0);
 	free(args.files);
 	return (0);
 }

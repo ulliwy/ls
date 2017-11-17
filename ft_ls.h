@@ -6,7 +6,7 @@
 /*   By: iprokofy <iprokofy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/09 11:13:38 by iprokofy          #+#    #+#             */
-/*   Updated: 2017/11/16 16:58:58 by iprokofy         ###   ########.fr       */
+/*   Updated: 2017/11/17 14:35:27 by iprokofy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 #include <dirent.h>
 
 # define MAX_LEN 5
+# define N_COL 4
+# define COL_SIZE 16
 
 typedef struct	s_opt
 {
@@ -39,6 +41,6 @@ typedef struct 	s_dir
 	char		**files;
 }				t_dir;
 
-int		sort_files(char **arr, int n);
+int		sort_files(char **arr, int n, int rev);
 
 #endif
