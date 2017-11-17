@@ -6,7 +6,7 @@
 /*   By: iprokofy <iprokofy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/06 15:30:34 by iprokofy          #+#    #+#             */
-/*   Updated: 2017/11/16 14:14:35 by iprokofy         ###   ########.fr       */
+/*   Updated: 2017/11/16 17:08:25 by iprokofy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,13 @@ void	print_parameters(t_opt opts)
 	printf("   t: %d\n", opts.t);
 }
 
+void	dir_init(t_dir *arr)
+{
+	arr->cur = 0;
+	arr->max = MAX_LEN;
+	arr->files = (char **)malloc((sizeof(char *)) * arr->max);
+}
+
 void	print_names(t_dir *arr)
 {
 	int i = 0;
@@ -81,31 +88,25 @@ void	print_names(t_dir *arr)
 	printf("cur: %d\n", arr->cur);
 	while (i < arr->cur)
 	{
-		printf("%s\n", (arr->files[i]).name);
+		printf("%s\n", arr->files[i]);
 		i++;
 	}
 }
 
-void	ls_files(t_dir fls)
+void	ls_files(t_dir fls, t_opt opts)
 {
 	int i;
 
+	opt_init(&opts);
 	i = 0;
 	while (i < fls.cur)
 	{
-		printf("%d: %s\n", i, fls.files[i].name);
+		printf("%d: %s\n", i, fls.files[i]);
 		i++;
 	}
 }
 
-void	ft_ls(char *name)
-{
-	printf("%s:\n", name);
-}
-
-
-
-t_file	*pcpy(t_file *dst, t_file *src, size_t n)
+char	**pcpy(char **dst, char **src, size_t n)
 {
 	while (n > 0)
 	{
@@ -117,45 +118,113 @@ t_file	*pcpy(t_file *dst, t_file *src, size_t n)
 	return (dst);
 }
 
+// void	append_stat(t_dir *arr, char *name, struct stat s_file_stat)
+// {
+// 	t_file	*new_arr;
+
+// 	if (arr->cur == arr->max)
+// 	{
+// 		new_arr = (t_file *)malloc((sizeof(t_file)) * arr->max * 2);
+// 		pcpy(new_arr, arr->files, arr->max);
+// 		free(arr->files);
+// 		arr->files = new_arr;
+// 		arr->max = arr->max * 2;
+// 	}  
+// 	(arr->files[arr->cur]).name = name;
+// 	(arr->files[arr->cur]).s_stat = s_file_stat;
+// 	arr->cur++;
+// }
+
+// char	*ft_addpath(char const *s1, char const *s2)
+// {
+// 	char			*new;
+// 	char			*new_start;
+
+// 	if (!s1 || !s2)
+// 		return (NULL);
+// 	if (!(new = (char *)malloc(sizeof(char) *
+// 		(ft_strlen(s1) + ft_strlen(s2) + 1 + 1))))
+// 		return (NULL);
+// 	new_start = new;
+// 	while (*s1)
+// 	{
+// 		*new = *s1;
+// 		new++;
+// 		s1++;
+// 	}
+// 	*new = '/';
+// 	new++;
+// 	while (*s2)
+// 	{
+// 		*new = *s2;
+// 		new++;
+// 		s2++;
+// 	}
+// 	*new = '\0';
+// 	return (new_start);
+// }
+
 void	append(t_dir *arr, char *name)
 {
-	t_file	*new_arr;
+	char	**new_arr;
 
 	if (arr->cur == arr->max)
 	{
-		new_arr = (t_file *)malloc((sizeof(t_file)) * arr->max * 2);
+		new_arr = (char **)malloc((sizeof(char *)) * arr->max * 2);
 		pcpy(new_arr, arr->files, arr->max);
 		free(arr->files);
 		arr->files = new_arr;
 		arr->max = arr->max * 2;
 	}  
-	(arr->files[arr->cur]).name = name;
+	arr->files[arr->cur] = name;
 	arr->cur++;
 }
 
-void	append_stat(t_dir *arr, char *name, struct stat s_file_stat)
-{
-	t_file	*new_arr;
+// void	ft_ls(char *d, t_opt opts)
+// {
+// 	DIR 			*dir;
+// 	struct dirent 	*dp;
+// 	t_dir 			items;
+// 	struct stat		s_file_stat;
+// 	int i;
+// 	char *new;
 
-	if (arr->cur == arr->max)
-	{
-		new_arr = (t_file *)malloc((sizeof(t_file)) * arr->max * 2);
-		pcpy(new_arr, arr->files, arr->max);
-		free(arr->files);
-		arr->files = new_arr;
-		arr->max = arr->max * 2;
-	}  
-	(arr->files[arr->cur]).name = name;
-	(arr->files[arr->cur]).s_stat = s_file_stat;
-	arr->cur++;
-}
+// 	dir_init(&items);
+// 	if (!(dir = opendir(d)))
+// 	{
+// 		ft_putstr("ft_ls: ");
+// 		perror(d);
+// 	}
+// 	while ((dp = readdir(dir)))
+// 	{
+// 		if (ft_strcmp(dp->d_name, ".") && ft_strcmp(dp->d_name, ".."))
+// 		{
+// 			stat(dp->d_name, &s_file_stat);
+// 			append(&items, dp->d_name);
+// 		}
+// 	}
+// 	ls_files(items, opts);
+// 	i = 0;
+// 	if (opts.R)
+// 	{
+// 		while (i < items.cur)
+// 		{
+// 			if (!stat(items.files[i].name, &s_file_stat))
+// 				if (S_ISDIR(s_file_stat.st_mode) && ft_strcmp(items.files[i].name, ".")
+// 					&& ft_strcmp(items.files[i].name, ".."))
+// 				{
+// 					new = ft_addpath(dp->d_name, items.files[i]);
+// 					//free()
+// 					//printf("dir: %s\n", items.files[i].name);
+// 					ft_ls(, opts);
+// 				}
+// 			i++;
+// 		}
+// 	}
+// 	free(items.files);
+// }
 
-void	dir_init(t_dir *arr)
-{
-	arr->cur = 0;
-	arr->max = MAX_LEN;
-	arr->files = (t_file *)malloc((sizeof(t_file)) * arr->max);
-}
+
 
 int 	pre_ls(t_dir arr, t_opt opts)
 {
@@ -169,23 +238,25 @@ int 	pre_ls(t_dir arr, t_opt opts)
 	dir_init(&dir);
 	while (i < arr.cur)
 	{
-		if (stat((arr.files[i]).name, &s_file_stat) < 0)
+		if (stat(arr.files[i], &s_file_stat) < 0)
 		{
 			ft_putstr("ft_ls: ");
-			perror((arr.files[i]).name);
+			perror(arr.files[i]);
 		}
 		else if (S_ISDIR(s_file_stat.st_mode))
-			append_stat(&dir, (arr.files[i]).name, s_file_stat);
+			append(&dir, arr.files[i]);
 		else
-			append_stat(&fls, (arr.files[i]).name, s_file_stat);
+			append(&fls, arr.files[i]);
 		i++;
 	}
-	//ls_files(fls);
-	free(fls.files);
+	ls_files(fls, opts);
 	i = 0;
-	ls_files(dir);
-	print_parameters(opts);
-
+	while (i < dir.cur)
+	{
+		//ft_ls(dir.files[i], opts);
+		i++;
+	}
+	free(fls.files);
 	free(dir.files);
 	return (0);
 }
@@ -218,6 +289,7 @@ int		main(int argc, char **argv)
 		append(&args, ".");
 	
 	sort_files(args.files, args.cur);
+	// print_parameters(opts);
 	//print_names(&args);
 	pre_ls(args, opts);
 	free(args.files);
