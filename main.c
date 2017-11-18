@@ -6,7 +6,7 @@
 /*   By: iprokofy <iprokofy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/06 15:30:34 by iprokofy          #+#    #+#             */
-/*   Updated: 2017/11/17 14:44:26 by iprokofy         ###   ########.fr       */
+/*   Updated: 2017/11/17 15:57:36 by iprokofy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,21 +102,34 @@ void	regular_output(t_dir fls, int hidden)
 {
 	int i;
 	int j;
+	int rows;
+	int offset;
 
 	i = 0;
 	hidden = 0;
-	while (i < fls.cur)
+	offset = 0;
+	//printf("%d %d\n", fls.cur, N_COL);
+	rows = fls.cur / N_COL + (fls.cur % N_COL ? 1 : 0);
+	//printf("%d\n", rows);
+	while (i < rows)
 	{
-		j = i;
+		j = 0;
 		if (i)
 			ft_printf("\n");
-		while (j < fls.cur)
+		while (j < N_COL && i + j * rows + offset < fls.cur)
 		{
-			//printf("j: %d\n", j);
-			ft_printf("%-*.15s", COL_SIZE, fls.files[j]);
-			j = j + 1 + N_COL;
+			if (fls.files[i + j * rows][0] == '.')
+			{
+				if (hidden)
+					ft_printf("%-*.15s", COL_SIZE, fls.files[i + j * rows + offset]);
+				else
+					offset++;
+			}
+			else
+				ft_printf("%-*.15s", COL_SIZE, fls.files[i + j * rows + offset]);
+			j++;
 		}
-		i = i + N_COL;
+		i++;
 	}
 
 	// while (i < N_COL)
