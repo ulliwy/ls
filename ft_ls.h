@@ -34,13 +34,19 @@ typedef struct	s_opt
 	int			cur_dir;
 }				t_opt;
 
+typedef struct	s_file
+{
+	char	*name;
+	long	mtime;
+}				t_file;
+
 typedef struct 	s_dir
 {
 	int			cur;
 	int 		max;
-	char		**files;
+	t_file		*files;
 }				t_dir;
 
-int		sort_files(char **arr, int n, int rev);
+int		sort_files(t_file *arr, int n, t_opt opts);
 
 #endif
