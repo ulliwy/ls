@@ -75,6 +75,7 @@ void	dir_init(t_dir *arr)
 {
 	arr->cur = 0;
 	arr->max = MAX_LEN;
+	arr->blk = 0;
 	arr->files = (t_file *)malloc((sizeof(t_file)) * arr->max);
 	(arr->info).links = 0;
 	(arr->info).username = 0;
@@ -196,7 +197,7 @@ void	print_extattr(char *path)
 {
 	ssize_t	buflen;
 
-	buflen = listxattr(path, NULL, 0, 0);
+	buflen = listxattr(path, NULL, 0, XATTR_NOFOLLOW);
 	if (buflen <= 0)
 		ft_putchar(' ');
 	else if (buflen > 0)
@@ -228,6 +229,23 @@ int 	ft_numlen(int n)
 
 // }
 
+void	print_time(struct stat f_stat)
+{
+	// Sat Dec  6 23:34:35 2014
+	char	*tstmp;
+	time_t	t;
+
+	tstmp = ctime(&f_stat.st_mtime);
+	ft_putchar(' ');
+	write(1, tstmp + 4, 4);
+	write(1, tstmp + 8, 3);
+	t = time(NULL);
+	if ((f_stat.st_mtime - t > 15770000) || (f_stat.st_mtime - t < -15770000))
+		write(1, tstmp + 19, 5);
+	else
+		write(1, tstmp + 11, 5);
+}
+
 void	long_output(t_dir fls, char *dir_name)
 {
 	char			*name;
@@ -237,16 +255,19 @@ void	long_output(t_dir fls, char *dir_name)
 	int 			maj;
 	int 			min;
 	int 			nbytes;
+	char			*linkname;
+	ssize_t			r;
 
 	i = 0;
-	printf("------------------------\n");
-	printf("links: %d\n", fls.info.links);
-	printf("username: %d\n", fls.info.username);
-	printf("group: %d\n", fls.info.group);
-	printf("nbytes: %d\n", ft_numlen(fls.info.nbytes));
-	printf("maj: %d\n", ft_numlen(fls.info.maj));
-	printf("min: %d\n", ft_numlen(fls.info.min));
-	printf("------------------------\n");
+	// printf("------------------------\n");
+	// printf("links: %d\n", fls.info.links);
+	// printf("username: %d\n", fls.info.username);
+	// printf("group: %d\n", fls.info.group);
+	// printf("nbytes: %d\n", fls.info.nbytes);
+	// printf("maj: %d\n", fls.info.maj);
+	// printf("min: %d\n", fls.info.min);
+	// printf("------------------------\n");
+	ft_printf("total %d\n", fls.blk);
 	while (i < fls.cur)
 	{
 		if (dir_name)
@@ -277,14 +298,19 @@ void	long_output(t_dir fls, char *dir_name)
 			ft_printf("  %*d, %*d", len - min, major(s_file_stat.st_rdev), min, minor(s_file_stat.st_rdev));
 		else
 			ft_printf("  %*d", len + (fls.info.maj + fls.info.min ? 2 : 0), s_file_stat.st_size);
-
-
-
-		ft_printf("  %ld", s_file_stat.st_mtime);
-		ft_printf(" %s\n", fls.files[i].name);
+		print_time(s_file_stat);
+		ft_printf(" %s", fls.files[i].name);
+		if (S_ISLNK(s_file_stat.st_mode))
+		{
+			linkname = (char *)malloc(s_file_stat.st_size + 1);
+			r = readlink(name, linkname, s_file_stat.st_size + 1);
+			ft_printf(" -> %s", linkname);
+			free(linkname);
+		}
 		if (dir_name)
 			free(name);
 		i++;
+		ft_putchar('\n');
 	}	
 }
 
@@ -295,7 +321,7 @@ void	regular_output(t_dir fls)
 	i = 0;
 	while (i < fls.cur)
 	{
-		ft_printf("---%s\n", fls.files[i].name);
+		ft_printf("%s\n", fls.files[i].name);
 		i++;
 	}
 	// rows = fls.cur / N_COL + (fls.cur % N_COL ? 1 : 0);
@@ -394,6 +420,8 @@ void	update_info(struct stat f_stat, t_dir *arr)
 	int 	maj;
 	int 	min;
 
+	//printf("nlink: %d\n", f_stat.st_nlink);
+
 	if (f_stat.st_nlink > (arr->info).links)
 		(arr->info).links = f_stat.st_nlink;
 	u_len = get_username_length(f_stat);
@@ -416,6 +444,7 @@ void	update_info(struct stat f_stat, t_dir *arr)
 	}
 	if (f_stat.st_size > (arr->info).nbytes)
 		(arr->info).nbytes = f_stat.st_size;
+	arr->blk += f_stat.st_blocks;
 }
 
 void	free_filenames(t_dir *dir)
@@ -449,7 +478,9 @@ void	ft_ls(char *d, t_opt opts, int need_dir_name)
 	//printf("DIR: %s\n", d);
 	while ((dp = readdir(dir)))
 	{
-		lstat(dp->d_name, &s_file_stat);
+		//ft_printf("->%d:  %s\n", lstat(dp->d_name, &s_file_stat), dp->d_name);
+		name = create_path(d, dp->d_name);
+		lstat(name, &s_file_stat);
 		if (dp->d_name[0] == '.')
 		{
 			if (opts.a)
@@ -464,7 +495,16 @@ void	ft_ls(char *d, t_opt opts, int need_dir_name)
 		 	append(&items, dp->d_name, s_file_stat.st_mtime);
 		 	update_info(s_file_stat, &items);
 		}
+		free(name);
 	}
+	// printf("------------------------\n");
+	// printf("links: %d\n", items.info.links);
+	// printf("username: %d\n", items.info.username);
+	// printf("group: %d\n", items.info.group);
+	// printf("nbytes: %d\n", items.info.nbytes);
+	// printf("maj: %d\n", items.info.maj);
+	// printf("min: %d\n", items.info.min);
+	// printf("------------------------\n");
 	// sort_files(items.files, items.cur, opts);
 	//print_names(&items);
 	sort_files(items.files, items.cur, opts);
@@ -487,6 +527,8 @@ void	ft_ls(char *d, t_opt opts, int need_dir_name)
 			i++;
 		}
 	}
+	if (dir)
+		closedir(dir);
 	free_filenames(&items);
 	free(items.files);
 }
@@ -533,6 +575,7 @@ int 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 		ft_ls(dir.files[i].name, opts, need_dir_name);
 		i++;
 	}
+	// need_dir_name = 1;
 	free_filenames(&fls);
 	free_filenames(&dir);
 	free(fls.files);

@@ -17,11 +17,12 @@
 #include "ft_printf/ft_printf.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/xattr.h>
 #include <errno.h>
 #include <dirent.h>
 #include <pwd.h>
-#include <sys/xattr.h>
 #include <grp.h>
+#include <time.h>
 
 # define MAX_LEN 5
 # define N_COL 4
@@ -57,6 +58,7 @@ typedef struct 	s_dir
 {
 	int			cur;
 	int 		max;
+	int			blk;
 	t_file		*files;
 	t_info		info;
 }				t_dir;
