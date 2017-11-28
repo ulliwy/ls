@@ -76,22 +76,28 @@ void	dir_init(t_dir *arr)
 	arr->cur = 0;
 	arr->max = MAX_LEN;
 	arr->files = (t_file *)malloc((sizeof(t_file)) * arr->max);
+	(arr->info).links = 0;
+	(arr->info).username = 0;
+	(arr->info).group = 0;
+	(arr->info).nbytes = 0;
+	(arr->info).maj = 0;
+	(arr->info).min = 0;
 }
 
-// void	print_names(t_dir *arr)
-// {
-// 	int i = 0;
+void	print_names(t_dir *arr)
+{
+	int i = 0;
 
-// 	if (!arr)
-// 		return ;
+	if (!arr)
+		return ;
 
-// 	printf("cur: %d\n", arr->cur);
-// 	while (i < arr->cur)
-// 	{
-// 		printf("%s\n", arr->files[i].name);
-// 		i++;
-// 	}
-// }
+	printf("cur: %d\n", arr->cur);
+	while (i < arr->cur)
+	{
+		printf("%s\n", arr->files[i].name);
+		i++;
+	}
+}
 
 char	*create_path(char *outer, char *inner)
 {
@@ -112,12 +118,12 @@ char	*create_path(char *outer, char *inner)
 
 void	print_mode(struct stat f_stat)
 {
-	if (S_ISDIR(f_stat.st_mode))
+	if (S_ISLNK(f_stat.st_mode))
+		ft_putchar('l');
+	else if (S_ISDIR(f_stat.st_mode))
 		ft_putchar('d');
 	else if (S_ISREG(f_stat.st_mode))
 		ft_putchar('-');
-	else if (S_ISLNK(f_stat.st_mode))
-		ft_putchar('l');
 	else if (S_ISFIFO(f_stat.st_mode))
 		ft_putchar('p');
 	else if (S_ISSOCK(f_stat.st_mode))
@@ -128,26 +134,152 @@ void	print_mode(struct stat f_stat)
 		ft_putchar('b');	
 }
 
+void	print_perm(struct stat f_stat)
+{
+	f_stat.st_mode & S_IRUSR ? ft_putchar('r') : ft_putchar('-');
+	f_stat.st_mode & S_IWUSR ? ft_putchar('w') : ft_putchar('-');
+	if (!(f_stat.st_mode & S_IXUSR) && f_stat.st_mode & S_ISUID)
+		ft_putchar('S');
+	else if (f_stat.st_mode & S_IXUSR && f_stat.st_mode & S_ISUID)
+		ft_putchar('s');
+	else if (f_stat.st_mode & S_IXUSR)
+		ft_putchar('x');
+	else
+		ft_putchar('-');
+
+	f_stat.st_mode & S_IRGRP ? ft_putchar('r') : ft_putchar('-');
+	f_stat.st_mode & S_IWGRP ? ft_putchar('w') : ft_putchar('-');
+	if (!(f_stat.st_mode & S_IXGRP) && f_stat.st_mode & S_ISGID)
+		ft_putchar('S');
+	else if (f_stat.st_mode & S_IXGRP && f_stat.st_mode & S_ISGID)
+		ft_putchar('s');
+	else if (f_stat.st_mode & S_IXGRP)
+		ft_putchar('x');
+	else
+		ft_putchar('-');
+
+	f_stat.st_mode & S_IROTH ? ft_putchar('r') : ft_putchar('-');
+	f_stat.st_mode & S_IWOTH ? ft_putchar('w') : ft_putchar('-');
+	if (!(f_stat.st_mode & S_IXOTH) && f_stat.st_mode & S_ISVTX)
+		ft_putchar('T');
+	else if (f_stat.st_mode & S_ISVTX && f_stat.st_mode & S_IXOTH)
+		ft_putchar('t');
+	else if (f_stat.st_mode & S_IXOTH)
+		ft_putchar('x');
+	else
+		ft_putchar('-');
+}
+
+void	print_username(struct stat f_stat, int len)
+{
+	struct passwd	*pswd;
+
+	pswd = getpwuid(f_stat.st_uid);
+	if (pswd->pw_name)
+		ft_printf(" %-*s", len, pswd->pw_name);
+	else
+		ft_printf(" %-*ld", len, f_stat.st_uid);
+}
+
+void	print_groupname(struct stat f_stat, int len)
+{
+	struct group *grp;
+
+	grp = getgrgid(f_stat.st_gid);
+	if (grp->gr_name)
+		ft_printf("  %-*s", len, grp->gr_name);
+	else
+		ft_printf("  %-*ld", len, f_stat.st_gid);
+}
+
+void	print_extattr(char *path)
+{
+	ssize_t	buflen;
+
+	buflen = listxattr(path, NULL, 0, 0);
+	if (buflen <= 0)
+		ft_putchar(' ');
+	else if (buflen > 0)
+		ft_putchar('@');
+}
+
+int 	ft_numlen(int n)
+{
+	int len;
+
+	len = 0;
+	if (n == 0)
+		return (1);
+	while (n > 0)
+	{
+		n = n / 10;
+		len++;
+	}
+	return (len);
+}
+
+// void	print_size_dev(struct stat f_stat, t_info info)
+// {
+// 	// if (S_ISCHR(f_stat.st_mode) || S_ISBLK(f_stat.st_mode))
+// 	// 	ft_printf("--");
+// 	// else
+// 	// 	ft_printf("  %*d", info.)
+		
+
+// }
+
 void	long_output(t_dir fls, char *dir_name)
 {
 	char			*name;
 	int 			i;
 	struct stat		s_file_stat;
+	int 			len;
+	int 			maj;
+	int 			min;
+	int 			nbytes;
 
 	i = 0;
+	printf("------------------------\n");
+	printf("links: %d\n", fls.info.links);
+	printf("username: %d\n", fls.info.username);
+	printf("group: %d\n", fls.info.group);
+	printf("nbytes: %d\n", ft_numlen(fls.info.nbytes));
+	printf("maj: %d\n", ft_numlen(fls.info.maj));
+	printf("min: %d\n", ft_numlen(fls.info.min));
+	printf("------------------------\n");
 	while (i < fls.cur)
 	{
 		if (dir_name)
 			name = create_path(dir_name, fls.files[i].name);
 		else
 			name = fls.files[i].name;
-		if (stat(name, &s_file_stat) < 0)
+		if (lstat(name, &s_file_stat) < 0)
 		{
 			ft_putstr("ft_ls: ");
 			perror(fls.files[i].name);
 			return ;
 		}
 		print_mode(s_file_stat);
+		print_perm(s_file_stat);
+		print_extattr(name);
+		ft_printf(" %*d", ft_numlen(fls.info.links), s_file_stat.st_nlink);
+		print_username(s_file_stat, fls.info.username);
+		print_groupname(s_file_stat, fls.info.group);
+		//print_size_dev(s_file_stat, fls.info);
+		maj = ft_numlen(fls.info.maj);
+		min = ft_numlen(fls.info.min);
+		nbytes = ft_numlen(fls.info.nbytes);
+		if (fls.info.maj + fls.info.min)
+			len = maj + min + 2 > nbytes ? maj + min : nbytes;
+		else
+			len = nbytes;
+		if (S_ISCHR(s_file_stat.st_mode) || S_ISBLK(s_file_stat.st_mode))
+			ft_printf("  %*d, %*d", len - min, major(s_file_stat.st_rdev), min, minor(s_file_stat.st_rdev));
+		else
+			ft_printf("  %*d", len + (fls.info.maj + fls.info.min ? 2 : 0), s_file_stat.st_size);
+
+
+
 		ft_printf("  %ld", s_file_stat.st_mtime);
 		ft_printf(" %s\n", fls.files[i].name);
 		if (dir_name)
@@ -163,7 +295,7 @@ void	regular_output(t_dir fls)
 	i = 0;
 	while (i < fls.cur)
 	{
-		ft_printf("%s\n", fls.files[i].name);
+		ft_printf("---%s\n", fls.files[i].name);
 		i++;
 	}
 	// rows = fls.cur / N_COL + (fls.cur % N_COL ? 1 : 0);
@@ -227,13 +359,76 @@ void	append(t_dir *arr, char *name, long mtime)
 		free(arr->files);
 		arr->files = new_arr;
 		arr->max = arr->max * 2;
-	}  
-	arr->files[arr->cur].name = name;
+	}
+	arr->files[arr->cur].name = ft_strdup(name);
 	arr->files[arr->cur].mtime = mtime;
 	arr->cur++;
 }
 
+int 	get_username_length(struct stat f_stat)
+{
+	struct passwd *pswd;
 
+	pswd = getpwuid(f_stat.st_uid);
+	if (pswd->pw_name)
+		return (ft_strlen(pswd->pw_name));
+	else
+		return (ft_numlen(f_stat.st_uid));
+}
+
+int 	get_group_length(struct stat f_stat)
+{
+	struct group *grp;
+
+	grp = getgrgid(f_stat.st_gid);
+	if (grp->gr_name)
+		return (ft_strlen(grp->gr_name));
+	else
+		return (ft_numlen(f_stat.st_gid));
+}
+
+void	update_info(struct stat f_stat, t_dir *arr)
+{
+	int		u_len;
+	int		g_len;
+	int 	maj;
+	int 	min;
+
+	if (f_stat.st_nlink > (arr->info).links)
+		(arr->info).links = f_stat.st_nlink;
+	u_len = get_username_length(f_stat);
+	if (u_len > (arr->info).username)
+		(arr->info).username = u_len;
+	g_len = get_group_length(f_stat);
+	if (g_len > (arr->info).group)
+		(arr->info).group = g_len;
+	if (f_stat.st_size > (arr->info).nbytes)
+		(arr->info).nbytes = f_stat.st_size;
+
+	if (S_ISCHR(f_stat.st_mode) || S_ISBLK(f_stat.st_mode))
+	{
+		maj = major(f_stat.st_rdev);
+		min = minor(f_stat.st_rdev);
+		if (maj > (arr->info).maj)
+			(arr->info).maj = maj;
+		if (min > (arr->info).min)
+			(arr->info).min = min;
+	}
+	if (f_stat.st_size > (arr->info).nbytes)
+		(arr->info).nbytes = f_stat.st_size;
+}
+
+void	free_filenames(t_dir *dir)
+{
+	int i;
+
+	i = 0;
+	while (i < dir->cur)
+	{
+		free((dir->files[i]).name);
+		i++;
+	}
+}
 
 void	ft_ls(char *d, t_opt opts, int need_dir_name)
 {
@@ -251,17 +446,27 @@ void	ft_ls(char *d, t_opt opts, int need_dir_name)
 		perror(d);
 		return ;
 	}
+	//printf("DIR: %s\n", d);
 	while ((dp = readdir(dir)))
 	{
-		stat(dp->d_name, &s_file_stat);
+		lstat(dp->d_name, &s_file_stat);
 		if (dp->d_name[0] == '.')
 		{
 			if (opts.a)
+			{
 				append(&items, dp->d_name, s_file_stat.st_mtime);
+				update_info(s_file_stat, &items);
+			}
 		}
 		else
+		{
+
 		 	append(&items, dp->d_name, s_file_stat.st_mtime);
+		 	update_info(s_file_stat, &items);
+		}
 	}
+	// sort_files(items.files, items.cur, opts);
+	//print_names(&items);
 	sort_files(items.files, items.cur, opts);
 	ls_files(items, opts, d, need_dir_name);
 	i = 0;
@@ -271,7 +476,7 @@ void	ft_ls(char *d, t_opt opts, int need_dir_name)
 		{
 
 			name = create_path(d, items.files[i].name);
-			if (!stat(name, &s_file_stat) && S_ISDIR(s_file_stat.st_mode)
+			if (!lstat(name, &s_file_stat) && S_ISDIR(s_file_stat.st_mode)
 					&& ft_strcmp(items.files[i].name, ".")
 					&& ft_strcmp(items.files[i].name, ".."))
 			{
@@ -282,6 +487,7 @@ void	ft_ls(char *d, t_opt opts, int need_dir_name)
 			i++;
 		}
 	}
+	free_filenames(&items);
 	free(items.files);
 }
 
@@ -297,15 +503,21 @@ int 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 	dir_init(&dir);
 	while (i < arr.cur)
 	{
-		if (stat(arr.files[i].name, &s_file_stat) < 0)
+		if (lstat(arr.files[i].name, &s_file_stat) < 0)
 		{
 			ft_putstr("ft_ls: ");
 			perror(arr.files[i].name);
 		}
 		else if (S_ISDIR(s_file_stat.st_mode))
+		{
 			append(&dir, arr.files[i].name, s_file_stat.st_mtime);
+			update_info(s_file_stat, &dir);
+		}
 		else
+		{
 			append(&fls, arr.files[i].name, s_file_stat.st_mtime);
+			update_info(s_file_stat, &fls);
+		}
 		i++;
 	}
 	sort_files(fls.files, fls.cur, opts);
@@ -321,6 +533,8 @@ int 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 		ft_ls(dir.files[i].name, opts, need_dir_name);
 		i++;
 	}
+	free_filenames(&fls);
+	free_filenames(&dir);
 	free(fls.files);
 	free(dir.files);
 	return (0);
@@ -353,6 +567,7 @@ int		main(int argc, char **argv)
 	if (!args.cur || opts.cur_dir)
 		append(&args, ".", 0);
 	pre_ls(args, opts, args.cur > 1 ? 1 : 0);
+	free_filenames(&args);
 	free(args.files);
 	return (0);
 }

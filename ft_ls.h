@@ -19,6 +19,9 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <dirent.h>
+#include <pwd.h>
+#include <sys/xattr.h>
+#include <grp.h>
 
 # define MAX_LEN 5
 # define N_COL 4
@@ -40,11 +43,22 @@ typedef struct	s_file
 	long	mtime;
 }				t_file;
 
+typedef struct	s_info
+{
+	int		links;
+	int		username;
+	int		group;
+	int		nbytes;
+	int		maj;
+	int		min;
+}				t_info;
+
 typedef struct 	s_dir
 {
 	int			cur;
 	int 		max;
 	t_file		*files;
+	t_info		info;
 }				t_dir;
 
 int		sort_files(t_file *arr, int n, t_opt opts);
