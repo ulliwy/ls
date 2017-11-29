@@ -30,6 +30,7 @@
 
 typedef struct	s_opt
 {
+	int			o;
 	int			l;
 	int			R;
 	int			a;
@@ -59,10 +60,12 @@ typedef struct 	s_dir
 	int			cur;
 	int 		max;
 	int			blk;
+	int			is_arg;
 	t_file		*files;
 	t_info		info;
 }				t_dir;
 
 int		sort_files(t_file *arr, int n, t_opt opts);
+void	sort_dates(t_file *arr, int n, t_opt opts);
 
 #endif

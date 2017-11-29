@@ -51,6 +51,8 @@ int		parse_opts(char *op, t_opt *opts, int *is_op)
 			opts->r = 1;
 		else if (*op == 't')
 			opts->t = 1;
+		else if (*op == '1')
+			opts->o = 1;
 		else
 		{
 			put_opt_error(*op);
@@ -76,6 +78,7 @@ void	dir_init(t_dir *arr)
 	arr->cur = 0;
 	arr->max = MAX_LEN;
 	arr->blk = 0;
+	arr->is_arg = 0;
 	arr->files = (t_file *)malloc((sizeof(t_file)) * arr->max);
 	(arr->info).links = 0;
 	(arr->info).username = 0;
@@ -95,7 +98,7 @@ void	print_names(t_dir *arr)
 	printf("cur: %d\n", arr->cur);
 	while (i < arr->cur)
 	{
-		printf("%s\n", arr->files[i].name);
+		printf("%ld : %s\n", arr->files[i].mtime, arr->files[i].name);
 		i++;
 	}
 }
@@ -267,7 +270,8 @@ void	long_output(t_dir fls, char *dir_name)
 	// printf("maj: %d\n", fls.info.maj);
 	// printf("min: %d\n", fls.info.min);
 	// printf("------------------------\n");
-	ft_printf("total %d\n", fls.blk);
+	if (fls.cur > 0 && !(fls.is_arg))
+		ft_printf("total %d\n", fls.blk);
 	while (i < fls.cur)
 	{
 		if (dir_name)
@@ -348,10 +352,8 @@ void	regular_output(t_dir fls)
 }
 
 
-int		ls_files(t_dir fls, t_opt opts, char *dir_name, int need_dir_name)
+int		ls_files(t_dir fls, t_opt opts, char *dir_name)
 {
-	if (need_dir_name)
-		ft_printf("%s:\n", dir_name);
 	if (!opts.l)
 		regular_output(fls);
 	else
@@ -468,10 +470,12 @@ void	ft_ls(char *d, t_opt opts, int need_dir_name)
 	int 			i;
 	char			*name;
 
+	if (need_dir_name)
+		ft_printf("%s:\n", d);
 	dir_init(&items);
 	if (!(dir = opendir(d)))
 	{
-		ft_putstr("ft_ls: ");
+		ft_putstr("ls: ");
 		perror(d);
 		return ;
 	}
@@ -507,8 +511,12 @@ void	ft_ls(char *d, t_opt opts, int need_dir_name)
 	// printf("------------------------\n");
 	// sort_files(items.files, items.cur, opts);
 	//print_names(&items);
-	sort_files(items.files, items.cur, opts);
-	ls_files(items, opts, d, need_dir_name);
+	//sort_files(items.files, items.cur, opts);
+	if (opts.t)
+		sort_dates(items.files, items.cur, opts);
+	else
+		sort_files(items.files, items.cur, opts);
+	ls_files(items, opts, d);
 	i = 0;
 	if (opts.R)
 	{
@@ -547,7 +555,7 @@ int 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 	{
 		if (lstat(arr.files[i].name, &s_file_stat) < 0)
 		{
-			ft_putstr("ft_ls: ");
+			ft_putstr("ls: ");
 			perror(arr.files[i].name);
 		}
 		else if (S_ISDIR(s_file_stat.st_mode))
@@ -562,9 +570,15 @@ int 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 		}
 		i++;
 	}
-	sort_files(fls.files, fls.cur, opts);
+	if (opts.t)
+		sort_dates(fls.files, fls.cur, opts);
+	else
+		sort_files(fls.files, fls.cur, opts);
 	if (fls.cur > 0)
-		ls_files(fls, opts, 0, 0);
+	{
+		fls.is_arg = 1;
+		ls_files(fls, opts, 0);
+	}
 	i = 0;
 	if (fls.cur > 0 && dir.cur > 0)
 		ft_printf("\n");
@@ -603,13 +617,17 @@ int		main(int argc, char **argv)
 		else
 		{
 			is_op = 0;
+			opts.cur_dir = 0;
 			append(&args, argv[i], 0);
 		}
 		i++;
 	}
+	//printf("cd: %d\n", opts.cur_dir);
 	if (!args.cur || opts.cur_dir)
 		append(&args, ".", 0);
-	pre_ls(args, opts, args.cur > 1 ? 1 : 0);
+	//print_names(&args);
+	if (parsed_opt)
+		pre_ls(args, opts, args.cur > 1 ? 1 : 0);
 	free_filenames(&args);
 	free(args.files);
 	return (0);
