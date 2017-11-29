@@ -27,41 +27,10 @@ void	put_opt_error(char opt)
 {
 	ft_putstr("ls: illegal option -- ");
 	ft_putchar(opt);
-	ft_putstr("\nusage: ls [-Ralrt] [file ...]\n");
+	ft_putstr("\nusage: ls [-ABCFGHLOPRSTUWabcdefghiklmnopqrstuwx1] [file ...]\n");
 }
 
-int		parse_opts(char *op, t_opt *opts, int *is_op)
-{
-	op++;
-	if (*op == '-' && !(*(op + 1)))
-	{
-		is_op = 0;
-		opts->cur_dir = 1;
-		return (1);
-	}
-	while (*op)
-	{
-		if (*op == 'l')
-			opts->l = 1;
-		else if (*op == 'R')
-			opts->R = 1;
-		else if (*op == 'a')
-			opts->a = 1;
-		else if (*op == 'r')
-			opts->r = 1;
-		else if (*op == 't')
-			opts->t = 1;
-		else if (*op == '1')
-			opts->o = 1;
-		else
-		{
-			put_opt_error(*op);
-			return (0);
-		}
-		op++;
-	}
-	return (1);
-}
+
 
 // void	print_parameters(t_opt opts)
 // {
@@ -306,8 +275,9 @@ void	long_output(t_dir fls, char *dir_name)
 		ft_printf(" %s", fls.files[i].name);
 		if (S_ISLNK(s_file_stat.st_mode))
 		{
-			linkname = (char *)malloc(s_file_stat.st_size + 1);
-			r = readlink(name, linkname, s_file_stat.st_size + 1);
+			linkname = (char *)malloc(1000);
+			ft_bzero(linkname, 1000);
+			r = readlink(name, linkname, 1000);
 			ft_printf(" -> %s", linkname);
 			free(linkname);
 		}
@@ -515,7 +485,7 @@ void	ft_ls(char *d, t_opt opts, int need_dir_name)
 	if (opts.t)
 		sort_dates(items.files, items.cur, opts);
 	else
-		sort_files(items.files, items.cur, opts);
+		sort_files(items.files, items.cur, opts.r);
 	ls_files(items, opts, d);
 	i = 0;
 	if (opts.R)
@@ -545,8 +515,10 @@ int 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 {
 	int			i;
 	struct stat	s_file_stat;
+	struct stat	s_file_stat_link;
 	t_dir		fls;
 	t_dir		dir;
+	char		*linkname;
 	
 	i = 0;
 	dir_init(&fls);
@@ -556,12 +528,32 @@ int 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 		if (lstat(arr.files[i].name, &s_file_stat) < 0)
 		{
 			ft_putstr("ls: ");
-			perror(arr.files[i].name);
+			if (arr.files[i].name[0])
+				perror(arr.files[i].name);
+			else
+				perror("fts_open");
 		}
 		else if (S_ISDIR(s_file_stat.st_mode))
 		{
 			append(&dir, arr.files[i].name, s_file_stat.st_mtime);
 			update_info(s_file_stat, &dir);
+		}
+		else if (S_ISLNK(s_file_stat.st_mode) && !(opts.l))
+		{
+			linkname = (char *)malloc(s_file_stat.st_size + 1);
+			readlink(arr.files[i].name, linkname, s_file_stat.st_size + 1);
+			lstat(linkname, &s_file_stat_link);
+			if (S_ISDIR(s_file_stat_link.st_mode))
+			{
+				append(&dir, arr.files[i].name, s_file_stat_link.st_mtime);
+				update_info(s_file_stat_link, &dir);
+			}
+			else
+			{
+				append(&fls, arr.files[i].name, s_file_stat.st_mtime);
+				update_info(s_file_stat, &fls);
+			}
+			free(linkname);
 		}
 		else
 		{
@@ -570,10 +562,19 @@ int 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 		}
 		i++;
 	}
+	//print_names(&dir);
+	//printf("-------\n");
+	//print_names(&fls);
 	if (opts.t)
+	{
+		sort_dates(dir.files, dir.cur, opts);
 		sort_dates(fls.files, fls.cur, opts);
+	}
 	else
-		sort_files(fls.files, fls.cur, opts);
+	{
+		sort_files(dir.files, dir.cur, opts.r);
+		sort_files(fls.files, fls.cur, opts.r);
+	}
 	if (fls.cur > 0)
 	{
 		fls.is_arg = 1;
@@ -597,6 +598,39 @@ int 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 	return (0);
 }
 
+int		parse_opts(char *op, t_opt *opts, int *is_op)
+{
+	op++;
+	if (*is_op && *op == '-' && !(*(op + 1)))
+	{
+		*is_op = 0;
+		opts->cur_dir = 1;
+		return (1);
+	}
+	while (*op)
+	{
+		if (*op == 'l')
+			opts->l = 1;
+		else if (*op == 'R')
+			opts->R = 1;
+		else if (*op == 'a')
+			opts->a = 1;
+		else if (*op == 'r')
+			opts->r = 1;
+		else if (*op == 't')
+			opts->t = 1;
+		else if (*op == '1')
+			opts->o = 1;
+		else
+		{
+			put_opt_error(*op);
+			return (0);
+		}
+		op++;
+	}
+	return (1);
+}
+
 int		main(int argc, char **argv)
 {
 	t_dir	args;
@@ -613,7 +647,10 @@ int		main(int argc, char **argv)
 	while (i < argc && parsed_opt)
 	{
 		if (argv[i][0] == '-' && argv[i][1] && is_op)
+		{
+			//printf("is_op: %d\n", is_op);
 			parsed_opt = parse_opts(argv[i], &opts, &is_op);
+		}
 		else
 		{
 			is_op = 0;
@@ -625,6 +662,7 @@ int		main(int argc, char **argv)
 	//printf("cd: %d\n", opts.cur_dir);
 	if (!args.cur || opts.cur_dir)
 		append(&args, ".", 0);
+	sort_files(args.files, args.cur, 0);
 	//print_names(&args);
 	if (parsed_opt)
 		pre_ls(args, opts, args.cur > 1 ? 1 : 0);

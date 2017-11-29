@@ -65,7 +65,7 @@ typedef struct 	s_dir
 	t_info		info;
 }				t_dir;
 
-int		sort_files(t_file *arr, int n, t_opt opts);
+int		sort_files(t_file *arr, int n, int r);
 void	sort_dates(t_file *arr, int n, t_opt opts);
 
 #endif

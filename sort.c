@@ -12,7 +12,7 @@
 
 #include "ft_ls.h"
 
-int		sort_files(t_file *arr, int n, t_opt opts)
+int		sort_files(t_file *arr, int n, int r)
 {
 	int i;
 	int j;
@@ -25,7 +25,7 @@ int		sort_files(t_file *arr, int n, t_opt opts)
 		j = 0;
 		while (j < n)
 		{
-			if (opts.r ? ft_strcmp(arr[i].name, arr[j].name) > 0 : ft_strcmp(arr[i].name, arr[j].name) < 0)
+			if (r ? ft_strcmp(arr[i].name, arr[j].name) > 0 : ft_strcmp(arr[i].name, arr[j].name) < 0)
 			{
 				tmp = arr[i].name;
 				arr[i].name = arr[j].name;
