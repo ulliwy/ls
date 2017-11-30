@@ -12,7 +12,8 @@
 
 NAME = ft_ls
 SRC = main.c\
-		sort.c
+		sort.c\
+		pre_ls.c
 LIBFT = libft/ft_memset.c\
 		libft/ft_bzero.c\
 		libft/ft_memcpy.c\
