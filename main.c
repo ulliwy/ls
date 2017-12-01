@@ -341,7 +341,7 @@ t_file	*pcpy(t_file *dst, t_file *src, int n)
 	return (ret);
 }
 
-void	append(t_dir *arr, char *name, long mtime)
+void	append(t_dir *arr, char *name, struct stat s_file_stat)
 {
 	t_file	*new_arr;
 
@@ -354,8 +354,9 @@ void	append(t_dir *arr, char *name, long mtime)
 		arr->max = arr->max * 2;
 	}
 	arr->files[arr->cur].name = ft_strdup(name);
-	arr->files[arr->cur].mtime = mtime;
+	arr->files[arr->cur].mtime = s_file_stat.st_mtime;
 	arr->cur++;
+	update_info(s_file_stat, arr);
 }
 
 int 	get_username_length(struct stat f_stat)
@@ -454,15 +455,15 @@ void	ft_ls(char *d, t_opt opts, int need_dir_name)
 		{
 			if (opts.a)
 			{
-				append(&items, dp->d_name, s_file_stat.st_mtime);
-				update_info(s_file_stat, &items);
+				append(&items, dp->d_name, s_file_stat);
+				//update_info(s_file_stat, &items);
 			}
 		}
 		else
 		{
 
-		 	append(&items, dp->d_name, s_file_stat.st_mtime);
-		 	update_info(s_file_stat, &items);
+		 	append(&items, dp->d_name, s_file_stat);
+		 	//update_info(s_file_stat, &items);
 		}
 		free(name);
 	}
@@ -516,6 +517,22 @@ int	put_opt_error(char opt)
 	return (0);
 }
 
+void	append_names(t_dir *arr, char *name)
+{
+	t_file	*new_arr;
+
+	if (arr->cur == arr->max)
+	{
+		new_arr = (t_file *)malloc((sizeof(t_file)) * arr->max * 2);
+		new_arr = pcpy(new_arr, arr->files, arr->max);
+		free(arr->files);
+		arr->files = new_arr;
+		arr->max = arr->max * 2;
+	}
+	arr->files[arr->cur].name = ft_strdup(name);
+	arr->cur++;
+}
+
 int		parse_opts(char *op, t_opt *opts, int *is_op)
 {
 	if (*is_op && *op == '-' && !(*(op + 1)))
@@ -562,7 +579,7 @@ int 	parse_args(char **argv, t_opt *opts, t_dir *args, int argc)
 		{
 			is_op = 0;
 			opts->cur_dir = 0;
-			append(args, argv[i], 0);
+			append_names(args, argv[i]);
 		}
 		i++;
 	}
@@ -581,11 +598,11 @@ int		main(int argc, char **argv)
 	ret = 0;
 	parsed_opt = parse_args(argv, &opts, &args, argc);
 	if (!args.cur || opts.cur_dir)
-		append(&args, ".", 0);
+		append_names(&args, ".");
 	sort_files(args.files, args.cur, 0);
 	if (parsed_opt)
-		ret = pre_ls(args, opts, args.cur > 1 ? 1 : 0);
+		pre_ls(args, opts, args.cur > 1 ? 1 : 0);
 	free_filenames(&args);
 	free(args.files);
-	return (!ret);
+	return (!parsed_opt);
 }

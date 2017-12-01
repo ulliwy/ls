@@ -67,12 +67,12 @@ typedef struct 	s_dir
 
 int		sort_files(t_file *arr, int n, int r);
 void	sort_dates(t_file *arr, int n, t_opt opts);
-int 	pre_ls(t_dir arr, t_opt opts, int need_dir_name);
+void 	pre_ls(t_dir arr, t_opt opts, int need_dir_name);
 
 
 void	dir_init(t_dir *arr);
 void	update_info(struct stat f_stat, t_dir *arr);
-void	append(t_dir *arr, char *name, long mtime);
+void	append(t_dir *arr, char *name, struct stat s_file_stat);
 int		ls_files(t_dir fls, t_opt opts, char *dir_name);
 void	ft_ls(char *d, t_opt opts, int need_dir_name);
 void	free_filenames(t_dir *dir);

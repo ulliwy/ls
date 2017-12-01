@@ -12,60 +12,62 @@
 
 #include "ft_ls.h"
 
-int 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
+void	put_stat_err(char *name)
 {
-	int			i;
+	ft_putstr("ls: ");
+	if (name[0])
+		perror(name);
+	else
+		perror("fts_open");
+}
+
+void	create_link(char *path, struct stat	*s_file_stat_link)
+{
+	char	*linkname;
+
+	linkname = (char *)malloc(1000);
+	readlink(path, linkname, 1000);
+	lstat(linkname, s_file_stat_link);
+	free(linkname);
+}
+
+void	split_args(t_dir arr, t_dir *fls, t_dir *dir, t_opt opts)
+{
 	struct stat	s_file_stat;
 	struct stat	s_file_stat_link;
+	int 		i;
+
+	i = 0;
+	while (i < arr.cur)
+	{
+		if (lstat(arr.files[i].name, &s_file_stat) < 0)
+			put_stat_err(arr.files[i].name);
+		else if (S_ISDIR(s_file_stat.st_mode))
+			append(dir, arr.files[i].name, s_file_stat);
+		else if (S_ISLNK(s_file_stat.st_mode) && !(opts.l))
+		{
+			create_link(arr.files[i].name, &s_file_stat_link);
+			if (S_ISDIR(s_file_stat_link.st_mode))
+				append(dir, arr.files[i].name, s_file_stat_link);
+			else
+				append(fls, arr.files[i].name, s_file_stat);
+		}
+		else
+			append(fls, arr.files[i].name, s_file_stat);
+		i++;
+	}
+}
+
+void 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
+{
+	int			i;
 	t_dir		fls;
 	t_dir		dir;
-	char		*linkname;
 	
 	i = 0;
 	dir_init(&fls);
 	dir_init(&dir);
-	while (i < arr.cur)
-	{
-		if (lstat(arr.files[i].name, &s_file_stat) < 0)
-		{
-			ft_putstr("ls: ");
-			if (arr.files[i].name[0])
-				perror(arr.files[i].name);
-			else
-				perror("fts_open");
-		}
-		else if (S_ISDIR(s_file_stat.st_mode))
-		{
-			append(&dir, arr.files[i].name, s_file_stat.st_mtime);
-			update_info(s_file_stat, &dir);
-		}
-		else if (S_ISLNK(s_file_stat.st_mode) && !(opts.l))
-		{
-			linkname = (char *)malloc(s_file_stat.st_size + 1);
-			readlink(arr.files[i].name, linkname, s_file_stat.st_size + 1);
-			lstat(linkname, &s_file_stat_link);
-			if (S_ISDIR(s_file_stat_link.st_mode))
-			{
-				append(&dir, arr.files[i].name, s_file_stat_link.st_mtime);
-				update_info(s_file_stat_link, &dir);
-			}
-			else
-			{
-				append(&fls, arr.files[i].name, s_file_stat.st_mtime);
-				update_info(s_file_stat, &fls);
-			}
-			free(linkname);
-		}
-		else
-		{
-			append(&fls, arr.files[i].name, s_file_stat.st_mtime);
-			update_info(s_file_stat, &fls);
-		}
-		i++;
-	}
-	//print_names(&dir);
-	//printf("-------\n");
-	//print_names(&fls);
+	split_args(arr, &fls, &dir, opts);
 	if (opts.t)
 	{
 		sort_dates(dir.files, dir.cur, opts);
@@ -81,7 +83,6 @@ int 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 		fls.is_arg = 1;
 		ls_files(fls, opts, 0);
 	}
-	i = 0;
 	if (fls.cur > 0 && dir.cur > 0)
 		ft_printf("\n");
 	while (i < dir.cur)
@@ -91,10 +92,8 @@ int 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 		ft_ls(dir.files[i].name, opts, need_dir_name);
 		i++;
 	}
-	// need_dir_name = 1;
 	free_filenames(&fls);
 	free_filenames(&dir);
 	free(fls.files);
 	free(dir.files);
-	return (0);
 }
