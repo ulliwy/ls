@@ -58,6 +58,25 @@ void	split_args(t_dir arr, t_dir *fls, t_dir *dir, t_opt opts)
 	}
 }
 
+void	aa(t_dir fls, t_opt opts, t_dir dir, int need_dir_name)
+{
+	int i = 0;
+	if (fls.cur > 0)
+	{
+		fls.is_arg = 1;
+		ls_files(fls, opts, 0);
+	}
+	if (fls.cur > 0 && dir.cur > 0)
+		ft_printf("\n");
+	while (i < dir.cur)
+	{
+		if (i)
+			ft_printf("\n");
+		ft_ls(dir.files[i].name, opts, need_dir_name);
+		i++;
+	}
+}
+
 void 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 {
 	int			i;
@@ -78,20 +97,7 @@ void 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 		sort_files(dir.files, dir.cur, opts.r);
 		sort_files(fls.files, fls.cur, opts.r);
 	}
-	if (fls.cur > 0)
-	{
-		fls.is_arg = 1;
-		ls_files(fls, opts, 0);
-	}
-	if (fls.cur > 0 && dir.cur > 0)
-		ft_printf("\n");
-	while (i < dir.cur)
-	{
-		if (i)
-			ft_printf("\n");
-		ft_ls(dir.files[i].name, opts, need_dir_name);
-		i++;
-	}
+	aa(fls, opts, dir, need_dir_name);
 	free_filenames(&fls);
 	free_filenames(&dir);
 	free(fls.files);
