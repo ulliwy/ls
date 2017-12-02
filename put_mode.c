@@ -33,12 +33,19 @@ void	print_mode(struct stat f_stat)
 void	print_extattr(char *path)
 {
 	ssize_t	buflen;
+	acl_t 	acl;
 
 	buflen = listxattr(path, NULL, 0, XATTR_NOFOLLOW);
-	if (buflen <= 0)
-		ft_putchar(' ');
-	else if (buflen > 0)
+	acl = acl_get_link_np(path, ACL_TYPE_EXTENDED);
+	if (buflen > 0)
 		ft_putchar('@');
+	else if (acl)
+	{
+		ft_putchar('+');
+		acl_free(acl);
+	}
+	else
+		ft_putchar(' ');
 }
 
 void	print_perm_own(struct stat f_stat)

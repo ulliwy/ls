@@ -23,16 +23,24 @@ void	print_link(char *name)
 	free(linkname);
 }
 
-void	print_dev_info(t_dir fls, struct stat s_file_stat, int i, char *name)
+void	put_uinfo(t_dir fls, struct stat s_file_stat, char *name, t_opt opts)
+{
+	print_mode(s_file_stat);
+	print_perm(s_file_stat);
+	print_extattr(name);
+	ft_printf(" %*d", ft_numlen(fls.info.links), s_file_stat.st_nlink);
+	if (!opts.g)
+		print_username(s_file_stat, fls.info.username);
+	print_groupname(s_file_stat, fls.info.group);
+}
+
+void	print_dev_info(t_dir fls, struct stat s_file_stat, t_opt opts)
 {
 	int 			maj;
 	int 			min;
 	int 			nbytes;
 	int 			len;
 
-	ft_printf(" %*d", ft_numlen(fls.info.links), s_file_stat.st_nlink);
-	print_username(s_file_stat, fls.info.username);
-	print_groupname(s_file_stat, fls.info.group);
 	maj = ft_numlen(fls.info.maj);
 	min = ft_numlen(fls.info.min);
 	nbytes = ft_numlen(fls.info.nbytes);
@@ -46,13 +54,17 @@ void	print_dev_info(t_dir fls, struct stat s_file_stat, int i, char *name)
 	else
 		ft_printf("  %*d", len + (fls.info.maj + fls.info.min ? 2 : 0),
 			s_file_stat.st_size);
-	print_time(s_file_stat);
+	print_time(s_file_stat, opts.u);
+}
+
+void	put_time_link(t_dir fls, struct stat s_file_stat, int i, char *name)
+{
 	ft_printf(" %s", fls.files[i].name);
 	if (S_ISLNK(s_file_stat.st_mode))
 		print_link(name);
 }
 
-void	long_output(t_dir fls, char *dir_name)
+void	long_output(t_dir fls, char *dir_name, t_opt opts)
 {
 	char			*name;
 	int 			i;
@@ -69,10 +81,9 @@ void	long_output(t_dir fls, char *dir_name)
 			name = fls.files[i].name;
 		if (lstat(name, &s_file_stat) < 0)
 			return (put_file_error(fls.files[i].name));
-		print_mode(s_file_stat);
-		print_perm(s_file_stat);
-		print_extattr(name);
-		print_dev_info(fls, s_file_stat, i, name);
+		put_uinfo(fls, s_file_stat, name, opts);
+		print_dev_info(fls, s_file_stat, opts);
+		put_time_link(fls, s_file_stat, i, name);
 		if (dir_name)
 			free(name);
 		i++;
@@ -97,6 +108,6 @@ int		ls_files(t_dir fls, t_opt opts, char *dir_name)
 	if (!opts.l)
 		regular_output(fls);
 	else
-		long_output(fls, dir_name);	
+		long_output(fls, dir_name, opts);	
 	return (1);
 }

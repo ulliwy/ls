@@ -51,10 +51,10 @@ void	read_dir(char *d, t_dir *items, t_opt opts)
 		if (dp->d_name[0] == '.')
 		{
 			if (opts.a)
-				append(items, dp->d_name, s_file_stat);
+				append(items, dp->d_name, s_file_stat, opts.u);
 		}
 		else
-		 	append(items, dp->d_name, s_file_stat);
+		 	append(items, dp->d_name, s_file_stat, opts.u);
 		free(name);
 	}
 	if (dir)
@@ -92,9 +92,9 @@ void	ft_ls(char *d, t_opt opts, int need_dir_name)
 		ft_printf("%s:\n", d);
 	dir_init(&items);
 	read_dir(d, &items, opts);
-	if (opts.t)
+	if (opts.t && opts.sort)
 		sort_dates(items.files, items.cur, opts);
-	else
+	else if (opts.sort)
 		sort_files(items.files, items.cur, opts.r);
 	ls_files(items, opts, d);
 	recursive_search(d, &items, opts);

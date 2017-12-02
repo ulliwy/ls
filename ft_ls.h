@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-//1lRart
+//1lRartfgu
 
 #ifndef FT_LS_H
 # define FT_LS_H
@@ -25,6 +25,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <time.h>
+#include <sys/acl.h>
 
 # define MAX_LEN 5
 # define N_COL 4
@@ -38,7 +39,10 @@ typedef struct	s_opt
 	int			a;
 	int			r;
 	int			t;
+	int 		g;
+	int 		u;
 	int			cur_dir;
+	int 		sort;
 }				t_opt;
 
 typedef struct	s_file
@@ -87,7 +91,7 @@ void	put_file_error(char *d);
 
 void	dir_init(t_dir *arr);
 void	append_names(t_dir *arr, char *name);
-void	append(t_dir *arr, char *name, struct stat s_file_stat);
+void	append(t_dir *arr, char *name, struct stat s_file_stat, int atime);
 void	free_filenames(t_dir *dir);
 
 int 	ft_numlen(int n);
@@ -97,13 +101,13 @@ void	update_info(struct stat f_stat, t_dir *arr);
 
 int		ls_files(t_dir fls, t_opt opts, char *dir_name);
 void	regular_output(t_dir fls);
-void	long_output(t_dir fls, char *dir_name);
+void	long_output(t_dir fls, char *dir_name, t_opt opts);
 
 void	print_mode(struct stat f_stat);
 void	print_perm(struct stat f_stat);
 void	print_username(struct stat f_stat, int len);
 void	print_groupname(struct stat f_stat, int len);
 void	print_extattr(char *path);
-void	print_time(struct stat f_stat);
+void	print_time(struct stat f_stat, int atime);
 
 #endif

@@ -44,17 +44,17 @@ void	split_args(t_dir arr, t_dir *fls, t_dir *dir, t_opt opts)
 		if (lstat(arr.files[i].name, &s_file_stat) < 0)
 			put_stat_err(arr.files[i].name);
 		else if (S_ISDIR(s_file_stat.st_mode))
-			append(dir, arr.files[i].name, s_file_stat);
+			append(dir, arr.files[i].name, s_file_stat, opts.u);
 		else if (S_ISLNK(s_file_stat.st_mode) && !(opts.l))
 		{
 			create_link(arr.files[i].name, &s_file_stat_link);
 			if (S_ISDIR(s_file_stat_link.st_mode))
-				append(dir, arr.files[i].name, s_file_stat_link);
+				append(dir, arr.files[i].name, s_file_stat_link, opts.u);
 			else
-				append(fls, arr.files[i].name, s_file_stat);
+				append(fls, arr.files[i].name, s_file_stat, opts.u);
 		}
 		else
-			append(fls, arr.files[i].name, s_file_stat);
+			append(fls, arr.files[i].name, s_file_stat, opts.u);
 		i++;
 	}
 }
@@ -88,12 +88,12 @@ void 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 	dir_init(&fls);
 	dir_init(&dir);
 	split_args(arr, &fls, &dir, opts);
-	if (opts.t)
+	if (opts.t && opts.sort)
 	{
 		sort_dates(dir.files, dir.cur, opts);
 		sort_dates(fls.files, fls.cur, opts);
 	}
-	else
+	else if (opts.sort)
 	{
 		sort_files(dir.files, dir.cur, opts.r);
 		sort_files(fls.files, fls.cur, opts.r);

@@ -58,7 +58,7 @@ void	append_names(t_dir *arr, char *name)
 	arr->cur++;
 }
 
-void	append(t_dir *arr, char *name, struct stat s_file_stat)
+void	append(t_dir *arr, char *name, struct stat s_file_stat, int atime)
 {
 	t_file	*new_arr;
 
@@ -71,7 +71,10 @@ void	append(t_dir *arr, char *name, struct stat s_file_stat)
 		arr->max = arr->max * 2;
 	}
 	arr->files[arr->cur].name = ft_strdup(name);
-	arr->files[arr->cur].mtime = s_file_stat.st_mtime;
+	if (atime)
+		arr->files[arr->cur].mtime = s_file_stat.st_atime;
+	else
+		arr->files[arr->cur].mtime = s_file_stat.st_mtime;
 	arr->cur++;
 	update_info(s_file_stat, arr);
 }

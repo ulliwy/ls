@@ -18,9 +18,9 @@ void	print_username(struct stat f_stat, int len)
 
 	pswd = getpwuid(f_stat.st_uid);
 	if (pswd->pw_name)
-		ft_printf(" %-*s", len, pswd->pw_name);
+		ft_printf(" %-*s ", len, pswd->pw_name);
 	else
-		ft_printf(" %-*ld", len, f_stat.st_uid);
+		ft_printf(" %-*ld ", len, f_stat.st_uid);
 }
 
 void	print_groupname(struct stat f_stat, int len)
@@ -29,17 +29,20 @@ void	print_groupname(struct stat f_stat, int len)
 
 	grp = getgrgid(f_stat.st_gid);
 	if (grp->gr_name)
-		ft_printf("  %-*s", len, grp->gr_name);
+		ft_printf(" %-*s", len, grp->gr_name);
 	else
-		ft_printf("  %-*ld", len, f_stat.st_gid);
+		ft_printf(" %-*ld", len, f_stat.st_gid);
 }
 
-void	print_time(struct stat f_stat)
+void	print_time(struct stat f_stat, int atime)
 {
 	char	*tstmp;
 	time_t	t;
 
-	tstmp = ctime(&f_stat.st_mtime);
+	if (atime)
+		tstmp = ctime(&f_stat.st_atime);
+	else
+		tstmp = ctime(&f_stat.st_mtime);
 	ft_putchar(' ');
 	write(1, tstmp + 4, 4);
 	write(1, tstmp + 8, 3);
