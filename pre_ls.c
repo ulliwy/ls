@@ -26,6 +26,7 @@ void	create_link(char *path, struct stat	*s_file_stat_link)
 	char	*linkname;
 
 	linkname = (char *)malloc(1000);
+	ft_bzero(linkname, 1000);
 	readlink(path, linkname, 1000);
 	lstat(linkname, s_file_stat_link);
 	free(linkname);
@@ -58,7 +59,7 @@ void	split_args(t_dir arr, t_dir *fls, t_dir *dir, t_opt opts)
 	}
 }
 
-void	aa(t_dir fls, t_opt opts, t_dir dir, int need_dir_name)
+void	split_print(t_dir fls, t_opt opts, t_dir dir, int need_dir_name)
 {
 	int i = 0;
 	if (fls.cur > 0)
@@ -97,7 +98,7 @@ void 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 		sort_files(dir.files, dir.cur, opts.r);
 		sort_files(fls.files, fls.cur, opts.r);
 	}
-	aa(fls, opts, dir, need_dir_name);
+	split_print(fls, opts, dir, need_dir_name);
 	free_filenames(&fls);
 	free_filenames(&dir);
 	free(fls.files);

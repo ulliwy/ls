@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+//1lRart
+
 #ifndef FT_LS_H
 # define FT_LS_H
 
@@ -45,6 +47,15 @@ typedef struct	s_file
 	long	mtime;
 }				t_file;
 
+typedef struct	s_merge
+{
+	int			l;
+	int			r;
+	int			m;
+	int			k;
+	int			rev;
+}				t_merge;
+
 typedef struct	s_info
 {
 	int		links;
@@ -67,14 +78,32 @@ typedef struct 	s_dir
 
 int		sort_files(t_file *arr, int n, int r);
 void	sort_dates(t_file *arr, int n, t_opt opts);
-void 	pre_ls(t_dir arr, t_opt opts, int need_dir_name);
+void	merge_sort(t_file *arr, int l, int r, int rev);
 
+void 	pre_ls(t_dir arr, t_opt opts, int need_dir_name);
+void	ft_ls(char *d, t_opt opts, int need_dir_name);
+char	*create_path(char *outer, char *inner);
+void	put_file_error(char *d);
 
 void	dir_init(t_dir *arr);
-void	update_info(struct stat f_stat, t_dir *arr);
+void	append_names(t_dir *arr, char *name);
 void	append(t_dir *arr, char *name, struct stat s_file_stat);
-int		ls_files(t_dir fls, t_opt opts, char *dir_name);
-void	ft_ls(char *d, t_opt opts, int need_dir_name);
 void	free_filenames(t_dir *dir);
+
+int 	ft_numlen(int n);
+int 	get_username_length(struct stat f_stat);
+int 	get_group_length(struct stat f_stat);
+void	update_info(struct stat f_stat, t_dir *arr);
+
+int		ls_files(t_dir fls, t_opt opts, char *dir_name);
+void	regular_output(t_dir fls);
+void	long_output(t_dir fls, char *dir_name);
+
+void	print_mode(struct stat f_stat);
+void	print_perm(struct stat f_stat);
+void	print_username(struct stat f_stat, int len);
+void	print_groupname(struct stat f_stat, int len);
+void	print_extattr(char *path);
+void	print_time(struct stat f_stat);
 
 #endif

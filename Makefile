@@ -13,7 +13,14 @@
 NAME = ft_ls
 SRC = main.c\
 		sort.c\
-		pre_ls.c
+		pre_ls.c\
+		ls.c\
+		darray_handler.c\
+		stat.c\
+		put_ls.c\
+		put_mode.c\
+		put_user_info.c\
+		merge_sort.c
 LIBFT = libft/ft_memset.c\
 		libft/ft_bzero.c\
 		libft/ft_memcpy.c\
@@ -93,7 +100,7 @@ PRINTFO = $(PRINTF:.c=.o)
 
 all: $(NAME)
 
-ft_ls: $(SRC) $(LIBFTO)
+ft_ls: $(SRC) $(LIBFTO) $(PRINTFO)
 	gcc $(FLAGS) $(SRC) $(LIBFT) $(PRINTF) -o $(NAME)
 
 clean:
