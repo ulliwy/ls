@@ -52,3 +52,25 @@ void	print_time(struct stat f_stat, int atime)
 	else
 		write(1, tstmp + 11, 5);
 }
+
+void	put_uinfo(t_dir fls, struct stat s_file_stat, char *name, t_opt opts)
+{
+	print_mode(s_file_stat);
+	print_perm(s_file_stat);
+	print_extattr(name);
+	ft_printf(" %*d", ft_numlen(fls.info.links), s_file_stat.st_nlink);
+	if (!opts.g)
+		print_username(s_file_stat, fls.info.username);
+	print_groupname(s_file_stat, fls.info.group);
+}
+
+void	print_link(char *name)
+{
+	char			*linkname;
+
+	linkname = (char *)malloc(1000);
+	ft_bzero(linkname, 1000);
+	readlink(name, linkname, 1000);
+	ft_printf(" -> %s", linkname);
+	free(linkname);
+}

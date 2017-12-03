@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-//1lRartfgu
+/*options: 1lRartfgud*/
 
 #ifndef FT_LS_H
 # define FT_LS_H
@@ -41,6 +41,7 @@ typedef struct	s_opt
 	int			t;
 	int 		g;
 	int 		u;
+	int 		d;
 	int			cur_dir;
 	int 		sort;
 }				t_opt;
@@ -84,6 +85,10 @@ int		sort_files(t_file *arr, int n, int r);
 void	sort_dates(t_file *arr, int n, t_opt opts);
 void	merge_sort(t_file *arr, int l, int r, int rev);
 
+void	opt_init(t_opt *opts);
+int		parse_opts(char *op, t_opt *opts, int *is_op);
+int		put_opt_error(char opt);
+
 void 	pre_ls(t_dir arr, t_opt opts, int need_dir_name);
 void	ft_ls(char *d, t_opt opts, int need_dir_name);
 char	*create_path(char *outer, char *inner);
@@ -106,8 +111,10 @@ void	long_output(t_dir fls, char *dir_name, t_opt opts);
 void	print_mode(struct stat f_stat);
 void	print_perm(struct stat f_stat);
 void	print_username(struct stat f_stat, int len);
+void	put_uinfo(t_dir fls, struct stat s_file_stat, char *name, t_opt opts);
 void	print_groupname(struct stat f_stat, int len);
 void	print_extattr(char *path);
 void	print_time(struct stat f_stat, int atime);
+void	print_link(char *name);
 
 #endif

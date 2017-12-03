@@ -20,7 +20,8 @@ SRC = main.c\
 		put_ls.c\
 		put_mode.c\
 		put_user_info.c\
-		merge_sort.c
+		merge_sort.c\
+		parse_opts.c
 LIBFT = libft/ft_memset.c\
 		libft/ft_bzero.c\
 		libft/ft_memcpy.c\

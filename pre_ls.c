@@ -43,9 +43,9 @@ void	split_args(t_dir arr, t_dir *fls, t_dir *dir, t_opt opts)
 	{
 		if (lstat(arr.files[i].name, &s_file_stat) < 0)
 			put_stat_err(arr.files[i].name);
-		else if (S_ISDIR(s_file_stat.st_mode))
+		else if (S_ISDIR(s_file_stat.st_mode) && !(opts.d))
 			append(dir, arr.files[i].name, s_file_stat, opts.u);
-		else if (S_ISLNK(s_file_stat.st_mode) && !(opts.l))
+		else if (S_ISLNK(s_file_stat.st_mode) && !(opts.l) && !(opts.d))
 		{
 			create_link(arr.files[i].name, &s_file_stat_link);
 			if (S_ISDIR(s_file_stat_link.st_mode))
