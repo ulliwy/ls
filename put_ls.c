@@ -14,10 +14,10 @@
 
 void	print_dev_info(t_dir fls, struct stat s_file_stat, t_opt opts)
 {
-	int 			maj;
-	int 			min;
-	int 			nbytes;
-	int 			len;
+	int	maj;
+	int	min;
+	int	nbytes;
+	int	len;
 
 	maj = ft_numlen(fls.info.maj);
 	min = ft_numlen(fls.info.min);
@@ -44,9 +44,9 @@ void	put_time_link(t_dir fls, struct stat s_file_stat, int i, char *name)
 
 void	long_output(t_dir fls, char *dir_name, t_opt opts)
 {
-	char			*name;
-	int 			i;
-	struct stat		s_file_stat;
+	char		*name;
+	int			i;
+	struct stat	s_file_stat;
 
 	i = 0;
 	if (fls.cur > 0 && !(fls.is_arg))
@@ -66,7 +66,7 @@ void	long_output(t_dir fls, char *dir_name, t_opt opts)
 			free(name);
 		i++;
 		ft_putchar('\n');
-	}	
+	}
 }
 
 void	regular_output(t_dir fls)
@@ -86,6 +86,6 @@ int		ls_files(t_dir fls, t_opt opts, char *dir_name)
 	if (!opts.l)
 		regular_output(fls);
 	else
-		long_output(fls, dir_name, opts);	
+		long_output(fls, dir_name, opts);
 	return (1);
 }

@@ -32,8 +32,8 @@ void	set_halves(t_file *arr, t_file t1[], t_file t2[], t_merge merge)
 
 void	create_merge(t_file *arr, t_file t1[], t_file t2[], t_merge merge)
 {
-	int 	i;
-	int 	j;
+	int		i;
+	int		j;
 
 	i = 0;
 	j = 0;
@@ -60,22 +60,22 @@ void	create_merge(t_file *arr, t_file t1[], t_file t2[], t_merge merge)
 
 void	merge(t_file *arr, int l, int r, int rev)
 {
-	t_merge	merge;
-    t_file 	t1[l + (r - l) / 2 - l + 1];
-    t_file 	t2[r - l + (r - l) / 2];	
+	t_merge		merge;
+	t_file		t1[l + (r - l) / 2 - l + 1];
+	t_file		t2[r - l + (r - l) / 2];
 
-    merge.l = l;
-    merge.r = r;
-    merge.m = l + (r - l) / 2;
-    merge.k = l;
-    merge.rev = rev;
-    set_halves(arr, t1, t2, merge);
+	merge.l = l;
+	merge.r = r;
+	merge.m = l + (r - l) / 2;
+	merge.k = l;
+	merge.rev = rev;
+	set_halves(arr, t1, t2, merge);
 	create_merge(arr, t1, t2, merge);
 }
 
-void		merge_sort(t_file *arr, int l, int r, int rev)
+void	merge_sort(t_file *arr, int l, int r, int rev)
 {
-	int 	m;
+	int		m;
 
 	if (l < r)
 	{

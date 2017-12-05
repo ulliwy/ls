@@ -14,9 +14,9 @@
 
 int		sort_files(t_file *arr, int n, int r)
 {
-	int i;
-	int j;
-	char *tmp;
+	int		i;
+	int		j;
+	char	*tmp;
 
 	i = 0;
 	j = 0;
@@ -39,7 +39,7 @@ int		sort_files(t_file *arr, int n, int r)
 	return (0);
 }
 
-void		sort_dates(t_file *arr, int n, t_opt opts)
+void	sort_dates(t_file *arr, int n, t_opt opts)
 {
 	return (merge_sort(arr, 0, n - 1, opts.r));
 }

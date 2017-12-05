@@ -12,7 +12,7 @@
 
 #include "ft_ls.h"
 
-int 	get_username_length(struct stat f_stat)
+int		get_username_length(struct stat f_stat)
 {
 	struct passwd *pswd;
 
@@ -23,7 +23,7 @@ int 	get_username_length(struct stat f_stat)
 		return (ft_numlen(f_stat.st_uid));
 }
 
-int 	get_group_length(struct stat f_stat)
+int		get_group_length(struct stat f_stat)
 {
 	struct group *grp;
 
@@ -34,7 +34,7 @@ int 	get_group_length(struct stat f_stat)
 		return (ft_numlen(f_stat.st_gid));
 }
 
-int 	ft_numlen(int n)
+int		ft_numlen(int n)
 {
 	int len;
 
@@ -51,8 +51,8 @@ int 	ft_numlen(int n)
 
 void	dev_info(struct stat f_stat, t_dir *arr)
 {
-	int 	maj;
-	int 	min;
+	int		maj;
+	int		min;
 
 	maj = major(f_stat.st_rdev);
 	min = minor(f_stat.st_rdev);
@@ -66,7 +66,7 @@ void	update_info(struct stat f_stat, t_dir *arr)
 {
 	int		u_len;
 	int		g_len;
-	
+
 	if (f_stat.st_nlink > (arr->info).links)
 		(arr->info).links = f_stat.st_nlink;
 	u_len = get_username_length(f_stat);

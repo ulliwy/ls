@@ -37,10 +37,10 @@ char	*create_path(char *outer, char *inner)
 
 void	read_dir(char *d, t_dir *items, t_opt opts)
 {
-	DIR 			*dir;
+	DIR				*dir;
 	char			*name;
 	struct stat		s_file_stat;
-	struct dirent 	*dp;
+	struct dirent	*dp;
 
 	if (!(dir = opendir(d)))
 		return (put_file_error(d));
@@ -54,7 +54,7 @@ void	read_dir(char *d, t_dir *items, t_opt opts)
 				append(items, dp->d_name, s_file_stat, opts.u);
 		}
 		else
-		 	append(items, dp->d_name, s_file_stat, opts.u);
+			append(items, dp->d_name, s_file_stat, opts.u);
 		free(name);
 	}
 	if (dir)
@@ -63,12 +63,12 @@ void	read_dir(char *d, t_dir *items, t_opt opts)
 
 void	recursive_search(char *d, t_dir *items, t_opt opts)
 {
-	int 	i;
-	char	*name;
-	struct stat		s_file_stat;
+	int			i;
+	char		*name;
+	struct stat	s_file_stat;
 
 	i = 0;
-	if (opts.R)
+	if (opts.rr)
 		while (i < items->cur)
 		{
 			name = create_path(d, (items->files[i]).name);
@@ -86,7 +86,7 @@ void	recursive_search(char *d, t_dir *items, t_opt opts)
 
 void	ft_ls(char *d, t_opt opts, int need_dir_name)
 {
-	t_dir 			items;
+	t_dir	items;
 
 	if (need_dir_name)
 		ft_printf("%s:\n", d);

@@ -12,34 +12,19 @@
 
 #include "ft_ls.h"
 
-// void	print_names(t_dir *arr)
-// {
-// 	int i = 0;
-
-// 	if (!arr)
-// 		return ;
-
-// 	printf("cur: %d\n", arr->cur);
-// 	while (i < arr->cur)
-// 	{
-// 		printf("%ld : %s\n", arr->files[i].mtime, arr->files[i].name);
-// 		i++;
-// 	}
-// }
-
-int	put_opt_error(char opt)
+int		put_opt_error(char opt)
 {
-	ft_putstr("ls: illegal option -- ");
+	ft_putstr("ft_ls: illegal option -- ");
 	ft_putchar(opt);
-	ft_putstr("\nusage: ls [-ABCFGHLOPRSTUWabcdefghiklmnopqrstuwx1] [file ...]\n");
+	ft_putstr("\nusage: ls [-Radfglrtu1] [file ...]\n");
 	return (0);
 }
 
-int 	parse_args(char **argv, t_opt *opts, t_dir *args, int argc)
+int		parse_args(char **argv, t_opt *opts, t_dir *args, int argc)
 {
-	int 	i;
-	int 	parsed_opt;
-	int 	is_op;
+	int		i;
+	int		parsed_opt;
+	int		is_op;
 
 	i = 1;
 	parsed_opt = 1;
@@ -63,8 +48,8 @@ int		main(int argc, char **argv)
 {
 	t_dir	args;
 	t_opt	opts;
-	int 	parsed_opt;
-	int 	ret;
+	int		parsed_opt;
+	int		ret;
 
 	dir_init(&args);
 	opt_init(&opts);

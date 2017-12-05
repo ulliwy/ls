@@ -27,13 +27,13 @@ void	print_mode(struct stat f_stat)
 	else if (S_ISCHR(f_stat.st_mode))
 		ft_putchar('c');
 	else if (S_ISBLK(f_stat.st_mode))
-		ft_putchar('b');	
+		ft_putchar('b');
 }
 
 void	print_extattr(char *path)
 {
 	ssize_t	buflen;
-	acl_t 	acl;
+	acl_t	acl;
 
 	buflen = listxattr(path, NULL, 0, XATTR_NOFOLLOW);
 	acl = acl_get_link_np(path, ACL_TYPE_EXTENDED);

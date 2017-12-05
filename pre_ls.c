@@ -14,7 +14,7 @@
 
 void	put_stat_err(char *name)
 {
-	ft_putstr("ls: ");
+	ft_putstr("ft_ls: ");
 	if (name[0])
 		perror(name);
 	else
@@ -36,7 +36,7 @@ void	split_args(t_dir arr, t_dir *fls, t_dir *dir, t_opt opts)
 {
 	struct stat	s_file_stat;
 	struct stat	s_file_stat_link;
-	int 		i;
+	int			i;
 
 	i = 0;
 	while (i < arr.cur)
@@ -61,7 +61,9 @@ void	split_args(t_dir arr, t_dir *fls, t_dir *dir, t_opt opts)
 
 void	split_print(t_dir fls, t_opt opts, t_dir dir, int need_dir_name)
 {
-	int i = 0;
+	int i;
+
+	i = 0;
 	if (fls.cur > 0)
 	{
 		fls.is_arg = 1;
@@ -78,12 +80,12 @@ void	split_print(t_dir fls, t_opt opts, t_dir dir, int need_dir_name)
 	}
 }
 
-void 	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
+void	pre_ls(t_dir arr, t_opt opts, int need_dir_name)
 {
 	int			i;
 	t_dir		fls;
 	t_dir		dir;
-	
+
 	i = 0;
 	dir_init(&fls);
 	dir_init(&dir);

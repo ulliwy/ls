@@ -15,7 +15,7 @@
 void	opt_init(t_opt *opts)
 {
 	opts->l = 0;
-	opts->R = 0;
+	opts->rr = 0;
 	opts->a = 0;
 	opts->r = 0;
 	opts->t = 0;
@@ -26,15 +26,15 @@ void	opt_init(t_opt *opts)
 	opts->cur_dir = 0;
 }
 
-int 	additional_opts(char *op, t_opt *opts)
+int		additional_opts(char *op, t_opt *opts)
 {
-	int 	ret;
+	int		ret;
 
 	ret = 1;
 	if (*op == 'l')
 		opts->l = 1;
 	else if (*op == 'R')
-		opts->R = 1;
+		opts->rr = 1;
 	else if (*op == 'a')
 		opts->a = 1;
 	else if (*op == 'r')
