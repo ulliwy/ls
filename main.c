@@ -16,7 +16,7 @@ int		put_opt_error(char opt)
 {
 	ft_putstr("ft_ls: illegal option -- ");
 	ft_putchar(opt);
-	ft_putstr("\nusage: ft_ls [-Radfglrtu1] [file ...]\n");
+	ft_putstr("\nusage: ft_ls [-RUadfglrtu1] [file ...]\n");
 	return (0);
 }
 

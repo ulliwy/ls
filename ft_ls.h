@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 /*
-**options: 1lRartfgud
+**options: 1lRUartfgud
 */
 
 #ifndef FT_LS_H
@@ -28,6 +28,7 @@
 # include <grp.h>
 # include <time.h>
 # include <sys/acl.h>
+# include <sys/ioctl.h>
 
 # define MAX_LEN 5
 # define N_COL 4
@@ -43,6 +44,7 @@ typedef struct		s_opt
 	int				t;
 	int				g;
 	int				u;
+	int				uu;
 	int				d;
 	int				cur_dir;
 	int				sort;
@@ -78,6 +80,8 @@ typedef struct		s_dir
 	int				cur;
 	int				max;
 	int				blk;
+	int				rows;
+	int				cols;
 	int				is_arg;
 	t_file			*files;
 	t_info			info;
@@ -118,7 +122,11 @@ void				put_uinfo(t_dir fls, struct stat s_file_stat, char *name,
 						t_opt opts);
 void				print_groupname(struct stat f_stat, int len);
 void				print_extattr(char *path);
-void				print_time(struct stat f_stat, int atime);
+void				print_time(struct stat f_stat, t_opt opts);
 void				print_link(char *name);
+
+void				column_output(t_dir fls);
+void				print_row(t_dir fls, int start, int blk);
+int					get_max_blk_length(t_dir fls, int *i);
 
 #endif

@@ -34,20 +34,24 @@ void	print_groupname(struct stat f_stat, int len)
 		ft_printf(" %-*ld", len, f_stat.st_gid);
 }
 
-void	print_time(struct stat f_stat, int atime)
+void	print_time(struct stat f_stat, t_opt opts)
 {
 	char	*tstmp;
 	time_t	t;
+	long	cur;
 
-	if (atime)
-		tstmp = ctime(&f_stat.st_atime);
+	if (opts.u)
+		cur = f_stat.st_atime;
+	else if (opts.uu)
+		cur = f_stat.st_birthtimespec.tv_sec;
 	else
-		tstmp = ctime(&f_stat.st_mtime);
+		cur = f_stat.st_mtime;
+	tstmp = ctime(&cur);
 	ft_putchar(' ');
 	write(1, tstmp + 4, 4);
 	write(1, tstmp + 8, 3);
 	t = time(NULL);
-	if ((f_stat.st_mtime - t > 15770000) || (f_stat.st_mtime - t < -15770000))
+	if ((cur - t > 15770000) || (cur - t < -15770000))
 		write(1, tstmp + 19, 5);
 	else
 		write(1, tstmp + 11, 5);

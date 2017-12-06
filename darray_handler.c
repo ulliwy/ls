@@ -17,6 +17,8 @@ void	dir_init(t_dir *arr)
 	arr->cur = 0;
 	arr->max = MAX_LEN;
 	arr->blk = 0;
+	arr->rows = 0;
+	arr->cols = 0;
 	arr->is_arg = 0;
 	arr->files = (t_file *)malloc((sizeof(t_file)) * arr->max);
 	(arr->info).links = 0;
@@ -75,6 +77,8 @@ void	append(t_dir *arr, char *name, struct stat s_file_stat, t_opt opts)
 	arr->files[arr->cur].name = ft_strdup(name);
 	if (opts.u)
 		arr->files[arr->cur].t = s_file_stat.st_atimespec;
+	else if (opts.uu)
+		arr->files[arr->cur].t = s_file_stat.st_birthtimespec;
 	else
 		arr->files[arr->cur].t = s_file_stat.st_mtimespec;
 	arr->cur++;

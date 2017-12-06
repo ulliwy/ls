@@ -14,7 +14,7 @@
 
 void	put_stat_err(char *name)
 {
-	ft_putstr("---ft_ls: ");
+	ft_putstr("ft_ls: ");
 	if (name[0])
 		perror(name);
 	else

@@ -27,12 +27,17 @@ void	print_dev_info(t_dir fls, struct stat s_file_stat, t_opt opts)
 	else
 		len = nbytes;
 	if (S_ISCHR(s_file_stat.st_mode) || S_ISBLK(s_file_stat.st_mode))
-		ft_printf("  %*d, %*d", len - min, major(s_file_stat.st_rdev), min,
-			minor(s_file_stat.st_rdev));
+	{
+		ft_printf("  %*d, ", len - min, major(s_file_stat.st_rdev));
+		if (minor(s_file_stat.st_rdev) > 4096)
+			ft_printf("%#0*x", 10, minor(s_file_stat.st_rdev));
+		else
+			ft_printf("%*d", min, minor(s_file_stat.st_rdev));
+	}
 	else
 		ft_printf("  %*d", len + (fls.info.maj + fls.info.min ? 2 : 0),
 			s_file_stat.st_size);
-	print_time(s_file_stat, opts.u);
+	print_time(s_file_stat, opts);
 }
 
 void	put_time_link(t_dir fls, struct stat s_file_stat, int i, char *name)
@@ -83,7 +88,14 @@ void	regular_output(t_dir fls)
 int		ls_files(t_dir fls, t_opt opts, char *dir_name)
 {
 	if (!opts.l)
-		regular_output(fls);
+	{
+		if (isatty(1) == 0)
+			regular_output(fls);
+		else if (opts.one)
+			regular_output(fls);
+		else
+			column_output(fls);
+	}
 	else
 		long_output(fls, dir_name, opts);
 	return (1);

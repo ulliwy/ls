@@ -21,12 +21,14 @@ void	opt_init(t_opt *opts)
 	opts->t = 0;
 	opts->g = 0;
 	opts->u = 0;
+	opts->uu = 0;
 	opts->d = 0;
+	opts->one = 0;
 	opts->sort = 1;
 	opts->cur_dir = 0;
 }
 
-int		additional_opts(char *op, t_opt *opts)
+int		additional_opts1(char *op, t_opt *opts)
 {
 	int		ret;
 
@@ -41,14 +43,37 @@ int		additional_opts(char *op, t_opt *opts)
 		opts->r = 1;
 	else if (*op == 't')
 		opts->t = 1;
-	else if (*op == 'u')
-		opts->u = 1;
 	else if (*op == 'd')
 		opts->d = 1;
 	else if (*op == 'g')
 	{
 		opts->g = 1;
 		opts->l = 1;
+	}
+	else
+		ret = 0;
+	return (ret);
+}
+
+int		additional_opts2(char *op, t_opt *opts)
+{
+	int		ret;
+
+	ret = 1;
+	if (*op == 'U')
+	{
+		opts->u = 0;
+		opts->uu = 1;
+	}
+	else if (*op == 'u')
+	{
+		opts->uu = 0;
+		opts->u = 1;
+	}
+	else if (*op == '1')
+	{
+		opts->one = 1;
+		opts->l = 0;
 	}
 	else
 		ret = 0;
@@ -65,13 +90,10 @@ int		parse_opts(char *op, t_opt *opts, int *is_op)
 	}
 	while (*op)
 	{
-		if (additional_opts(op, opts))
+		if (additional_opts1(op, opts))
 			;
-		else if (*op == '1')
-		{
-			opts->one = 1;
-			opts->l = 0;
-		}
+		else if (additional_opts2(op, opts))
+			;
 		else if (*op == 'f')
 		{
 			opts->a = 1;

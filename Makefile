@@ -21,7 +21,8 @@ SRC = main.c\
 		put_mode.c\
 		put_user_info.c\
 		merge_sort.c\
-		parse_opts.c
+		parse_opts.c\
+		column_print.c
 LIBFT = libft/ft_memset.c\
 		libft/ft_bzero.c\
 		libft/ft_memcpy.c\
