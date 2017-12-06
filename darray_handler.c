@@ -58,10 +58,12 @@ void	append_names(t_dir *arr, char *name)
 	arr->cur++;
 }
 
-void	append(t_dir *arr, char *name, struct stat s_file_stat, int atime)
+void	append(t_dir *arr, char *name, struct stat s_file_stat, t_opt opts)
 {
 	t_file	*new_arr;
 
+	if (!(getpwuid(s_file_stat.st_uid)) && opts.l)
+		return ;
 	if (arr->cur == arr->max)
 	{
 		new_arr = (t_file *)malloc((sizeof(t_file)) * arr->max * 2);
@@ -71,10 +73,10 @@ void	append(t_dir *arr, char *name, struct stat s_file_stat, int atime)
 		arr->max = arr->max * 2;
 	}
 	arr->files[arr->cur].name = ft_strdup(name);
-	if (atime)
-		arr->files[arr->cur].mtime = s_file_stat.st_atime;
+	if (opts.u)
+		arr->files[arr->cur].t = s_file_stat.st_atimespec;
 	else
-		arr->files[arr->cur].mtime = s_file_stat.st_mtime;
+		arr->files[arr->cur].t = s_file_stat.st_mtimespec;
 	arr->cur++;
 	update_info(s_file_stat, arr);
 }

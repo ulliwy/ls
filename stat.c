@@ -17,10 +17,14 @@ int		get_username_length(struct stat f_stat)
 	struct passwd *pswd;
 
 	pswd = getpwuid(f_stat.st_uid);
-	if (pswd->pw_name)
-		return (ft_strlen(pswd->pw_name));
-	else
-		return (ft_numlen(f_stat.st_uid));
+	if (pswd)
+	{
+		if (pswd->pw_name)
+			return (ft_strlen(pswd->pw_name));
+		else
+			return (ft_numlen(f_stat.st_uid));
+	}
+	return (0);
 }
 
 int		get_group_length(struct stat f_stat)

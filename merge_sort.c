@@ -30,6 +30,32 @@ void	set_halves(t_file *arr, t_file t1[], t_file t2[], t_merge merge)
 	}
 }
 
+int		t_cmp(int rev, struct timespec t1, struct timespec t2)
+{
+	if (rev)
+	{
+		if (t1.tv_sec < t2.tv_sec)
+			return (1);
+		else if (t1.tv_sec == t2.tv_sec && t1.tv_nsec < t2.tv_nsec)
+			return (1);
+		else if (t1.tv_sec == t2.tv_sec && t1.tv_nsec == t2.tv_nsec)
+			return (-1);
+		else
+			return (0);
+	}
+	else
+	{
+		if (t1.tv_sec > t2.tv_sec)
+			return (1);
+		else if (t1.tv_sec == t2.tv_sec && t1.tv_nsec > t2.tv_nsec)
+			return (1);
+		else if (t1.tv_sec == t2.tv_sec && t1.tv_nsec == t2.tv_nsec)
+			return (-1);
+		else
+			return (0);
+	}
+}
+
 void	create_merge(t_file *arr, t_file t1[], t_file t2[], t_merge merge)
 {
 	int		i;
@@ -39,12 +65,12 @@ void	create_merge(t_file *arr, t_file t1[], t_file t2[], t_merge merge)
 	j = 0;
 	while ((i < merge.m - merge.l + 1) && (j < merge.r - merge.m))
 	{
-		if (merge.rev ? t1[i].mtime < t2[j].mtime : t1[i].mtime > t2[j].mtime)
+		if (t_cmp(merge.rev, t1[i].t, t2[j].t) == 1)
 			arr[merge.k++] = t1[i++];
-		else if (t1[i].mtime == t2[j].mtime)
+		else if (t_cmp(merge.rev, t1[i].t, t2[j].t) == -1)
 		{
-			if (merge.rev ? ft_strcmp(t1[i].name, t2[j].name) > 0 :
-				ft_strcmp(t1[i].name, t2[j].name) <= 0)
+			if (merge.rev ? ft_strcmp(t1[i].name, t2[j].name) > 0
+				: ft_strcmp(t1[i].name, t2[j].name) <= 0)
 				arr[merge.k++] = t1[i++];
 			else
 				arr[merge.k++] = t2[j++];

@@ -57,8 +57,7 @@ void	long_output(t_dir fls, char *dir_name, t_opt opts)
 			name = create_path(dir_name, fls.files[i].name);
 		else
 			name = fls.files[i].name;
-		if (lstat(name, &s_file_stat) < 0)
-			return (put_file_error(fls.files[i].name));
+		lstat(name, &s_file_stat);
 		put_uinfo(fls, s_file_stat, name, opts);
 		print_dev_info(fls, s_file_stat, opts);
 		put_time_link(fls, s_file_stat, i, name);

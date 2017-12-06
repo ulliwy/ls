@@ -14,7 +14,7 @@
 
 void	put_file_error(char *d)
 {
-	ft_putstr("ls: ");
+	ft_putstr("ft_ls: ");
 	perror(d);
 }
 
@@ -51,10 +51,10 @@ void	read_dir(char *d, t_dir *items, t_opt opts)
 		if (dp->d_name[0] == '.')
 		{
 			if (opts.a)
-				append(items, dp->d_name, s_file_stat, opts.u);
+				append(items, dp->d_name, s_file_stat, opts);
 		}
 		else
-			append(items, dp->d_name, s_file_stat, opts.u);
+			append(items, dp->d_name, s_file_stat, opts);
 		free(name);
 	}
 	if (dir)

@@ -14,7 +14,7 @@
 
 void	put_stat_err(char *name)
 {
-	ft_putstr("ft_ls: ");
+	ft_putstr("---ft_ls: ");
 	if (name[0])
 		perror(name);
 	else
@@ -44,17 +44,17 @@ void	split_args(t_dir arr, t_dir *fls, t_dir *dir, t_opt opts)
 		if (lstat(arr.files[i].name, &s_file_stat) < 0)
 			put_stat_err(arr.files[i].name);
 		else if (S_ISDIR(s_file_stat.st_mode) && !(opts.d))
-			append(dir, arr.files[i].name, s_file_stat, opts.u);
+			append(dir, arr.files[i].name, s_file_stat, opts);
 		else if (S_ISLNK(s_file_stat.st_mode) && !(opts.l) && !(opts.d))
 		{
 			create_link(arr.files[i].name, &s_file_stat_link);
 			if (S_ISDIR(s_file_stat_link.st_mode))
-				append(dir, arr.files[i].name, s_file_stat_link, opts.u);
+				append(dir, arr.files[i].name, s_file_stat_link, opts);
 			else
-				append(fls, arr.files[i].name, s_file_stat, opts.u);
+				append(fls, arr.files[i].name, s_file_stat, opts);
 		}
 		else
-			append(fls, arr.files[i].name, s_file_stat, opts.u);
+			append(fls, arr.files[i].name, s_file_stat, opts);
 		i++;
 	}
 }
